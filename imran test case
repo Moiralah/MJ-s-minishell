@@ -1,0 +1,186 @@
+/// some of the fuck up cases imran share in the terminal which I copy below, and this just echo stuff man. SHIT.
+/// need to take care of space in quote without quote after quotes
+/// if quote dont have closure need to print dquote or quote
+/// this is hard man. so many thing can fuck up. I dont kknow what to do.
+/// notes guideline : dq = double quote , sq = single quote, after '#' it just my notes for the test case dont care the color.
+/// 4 stage of thing need to be take care of first before execution
+/// 1. get user input
+/// 2. put in linked list
+/// 3. validate if the command is complete, if not complete need to expand linked list.
+///	4. AST(ABSTRACT SYNTAX TREE) Parsing	#from what I ask around this is the best way to do parsing and tokenizing.
+///											#coz if we dont do it right the first time we gonna need to restructure our code from the beginning.
+/// https://m4nnb3ll.medium.com/minishell-building-a-mini-bash-a-42-project-b55a10598218 #this article help a lot
+/// https://www.youtube.com/watch?v=ubt-UjcQUYg #this video is quite useful
+
+
+huidris@u80z06s03 ~ %echo hello
+hello
+huidris@u80z06s03 ~ %echo       helo		#space need to ignore
+helo
+huidris@u80z06s03 ~ %echo "     hello"		#space inside quote cannot ignore
+     hello
+huidris@u80z06s03 ~ %echo "djbddhj			#double quote need to end
+dquote> djdd
+dquote> dhdvd
+dquote> fhdgvd
+dquote> bdhvh
+dquote> '
+dquote> dhdv"
+djbddhj
+djdd
+dhdvd
+fhdgvd
+bdhvh
+'
+dhdv
+huidris@u80z06s03 ~ %echo "abc				#the new line also need to print because it is inside the double quote
+dquote>
+dquote>
+dquote> "
+abc
+
+
+
+huidris@u80z06s03 ~ %echo "					#new line in double quote combine with words in single quote
+dquote>
+dquote>
+dquote> " '
+quote> gegege
+quote> gegeg
+quote> geef'
+
+
+
+
+gegege
+gegeg
+geef
+huidris@u80z06s03 ~ %echo "acb" 'def' "abc"'def'	#dq n sq without space need to be printed without space also
+acb def abcdef
+huidris@u80z06s03 ~ %"ec" 'ho'						#with space it is error
+zsh: command not found: ec
+huidris@u80z06s03 ~ %"ec"'ho' hellow				#without space it is command echo and need to print the argument
+hellow
+huidris@u80z06s03 ~ %'''' "'"						#whatever this shit is
+zsh: permission denied:
+huidris@u80z06s03 ~ %"'"'''"'''""'""'
+zsh: command not found: '"""
+huidris@u80z06s03 ~ %'"'"'"
+zsh: command not found: "'
+huidris@u80z06s03 ~ %'"' "							#dq inside sq does not count
+dquote> '"'											#this dq count because it close the prev dq, and open the new sq
+quote> '
+zsh: command not found: "
+huidris@u80z06s03 ~ %echo |							#after pipe need to have another command if not need to print pipe
+pipe> echo
+
+huidris@u80z06s03 ~ %"$TEST"
+zsh: permission denied:
+huidris@u80z06s03 ~ %export TEST=ho					#put the ho insde the TEST
+huidris@u80z06s03 ~ %echo $TEST
+ho
+huidris@u80z06s03 ~ %echo ec$TEST
+echo
+huidris@u80z06s03 ~ %ec$TEST hello					#now the 'ho' combine with ec it become the echo command.
+hello
+huidris@u80z06s03 ~ %$TEST
+zsh: command not found: ho
+huidris@u80z06s03 ~ %ec"$TEST"						#yup still command with the dq without space
+
+huidris@u80z06s03 ~ %ec"$TEST" hello
+hello
+huidris@u80z06s03 ~ %echo '$TEST'					#not a 'ho' if the TEST is inside dq or sq. fucker confusing me.
+$TEST
+huidris@u80z06s03 ~ %echo ' $TEST '
+ $TEST
+huidris@u80z06s03 ~ %$?
+zsh: command not found: 0
+huidris@u80z06s03 ~ %echo $?						#print error number from previous command
+127
+huidris@u80z06s03 ~ %echo hello
+hello
+huidris@u80z06s03 ~ %echo $?						#execute sucessful error code 0
+0
+huidris@u80z06s03 ~ %echo VAR=13 -n jebjh			#after echo all of it is argument
+VAR=13 -n jebjh
+huidris@u80z06s03 ~ %env							#after print env the VAR from prev is not here because it is just argument.
+SYSTEMD_EXEC_PID=3023599
+SSH_AUTH_SOCK=/run/user/102083/keyring/ssh
+SESSION_MANAGER=local/u80z06s03.42kl.edu.my:@/tmp/.ICE-unix/3023577,unix/u80z06s03.42kl.edu.my:/tmp/.ICE-unix/3023577
+GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/2193e538_0521_44e6_8320_38628dda1cb0
+LANG=en_US.UTF-8
+LANGUAGE=en_US:
+XDG_CURRENT_DESKTOP=ubuntu:GNOME
+FT_HOOK_NAME=login-user
+LC_IDENTIFICATION=fr_FR.UTF-8
+FT_HOOK_PATHNAME=login-user.d
+XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/huidris
+LIBVIRT_DEFAULT_URI=qemu:///system
+GPG_AGENT_INFO=/run/user/102083/gnupg/S.gpg-agent:0:1
+DESKTOP_SESSION=ubuntu
+QT_IM_MODULE=ibus
+XDG_MENU_PREFIX=gnome-
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session1
+PWD=/home/huidris
+USER=huidris
+GNOME_TERMINAL_SERVICE=:1.108
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/102083/bus
+QT_ACCESSIBILITY=1
+DOCKER_HOST=unix:///run/user/102083/docker.sock
+LC_NUMERIC=fr_FR.UTF-8
+SSH_AGENT_LAUNCHER=gnome-keyring
+GTK_MODULES=gail:atk-bridge
+XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/etc/xdg
+GTK_IM_MODULE=ibus
+XDG_SESSION_DESKTOP=ubuntu
+KRB5CCNAME=FILE:/tmp/krb5cc_102083_2wwGSW
+HOME=/home/huidris
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+LC_TIME=fr_FR.UTF-8
+XDG_DATA_DIRS=/usr/share/ubuntu:/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop
+LOGNAME=huidris
+LC_PAPER=fr_FR.UTF-8
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+PATH=/home/huidris/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+XDG_RUNTIME_DIR=/run/user/102083
+XMODIFIERS=@im=ibus
+SHELL=/bin/zsh
+XDG_SESSION_TYPE=x11
+LC_MONETARY=fr_FR.UTF-8
+LC_TELEPHONE=fr_FR.UTF-8
+LC_MEASUREMENT=fr_FR.UTF-8
+VTE_VERSION=6800
+COLORTERM=truecolor
+XAUTHORITY=/home/huidris/.Xauthority
+LC_NAME=fr_FR.UTF-8
+XDG_SESSION_CLASS=user
+TERM=xterm-256color
+GDMSESSION=ubuntu
+DISPLAY=:0
+LC_ADDRESS=fr_FR.UTF-8
+SHLVL=1
+OLDPWD=/home/huidris
+TEST=ho
+_=/usr/bin/env
+huidris@u80z06s03 ~ %echo ls cat rm
+ls cat rm
+huidris@u80z06s03 ~ %| cat							#need to handle error if there is no command before pipe
+zsh: parse error near `|'
+huidris@u80z06s03 ~ %echo     dbhd "   dvgd"   '
+quote> rge'"
+dquote> vhfd|
+dquote> "
+dbhd    dvgd
+rge
+vhfd|
+
+huidris@u80z04s01 ~ %<< EOF cat						#handling heredoc without dq at EOF need to expand the directory.
+heredoc> $HOME
+heredoc> EOF
+/home/huidris
+huidris@u80z04s01 ~ %<< "EOF" cat					#handling heredoc with dq at EOF no need to expand just print as it is.
+heredoc> $HOME										#the way to do this later. we need to hold on our quote in the tree as long as possible.
+heredoc> EOF
+$HOME
+
+
