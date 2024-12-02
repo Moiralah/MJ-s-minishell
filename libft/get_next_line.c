@@ -6,7 +6,7 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:13:39 by huidris           #+#    #+#             */
-/*   Updated: 2024/09/19 01:45:24 by huidris          ###   ########.fr       */
+/*   Updated: 2024/12/03 00:07:50 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ char	*extract_line(char *buffer_all, int check)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer_all[OPEN_MAX];
+	static char	*buffer_all[3000];
 	char		*line;
 
 	if (fd < 0)
