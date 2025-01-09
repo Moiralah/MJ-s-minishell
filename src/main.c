@@ -6,7 +6,7 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 18:47:25 by huidris           #+#    #+#             */
-/*   Updated: 2024/12/01 02:27:54 by huidris          ###   ########.fr       */
+/*   Updated: 2025/01/10 02:09:48 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,7 @@
 void	error_exit(char *str)
 {
 	ft_putstr_fd ("Error", 2);
-	ft_printf (": %s", str);
-	ft_printf ("\n");
+	ft_printf (": %s\n", str);
 	exit (1);
 }
 
@@ -30,25 +29,31 @@ int	forky(void)
 	return (pid);
 }
 
-int main(void)
+int getcmd(char *buf, size_t buf_size)
+{
+	char *input;
+
+	input = readline("\nminishell>");
+	if(!input)
+		return (-1);
+	if(*input)
+		add_history(input);
+	ft_strlcpy(buf, input, buf_size -1);
+	buf[buf_size -1] = '\0';
+	free(input);
+
+	return (0);
+}
+
+int main(int argc, char **argv, char **envp)
 {
 	static char	buf[100];
-	int			fd;
-
-	while((fd = open("console", O_RDWR)) >= 0)
-	{
-		if (fd >= 3)
-		{
-			close(fd);
-			break;
-		}
-	}
 
 	while(getcmd(buf, sizeof(buf)) >= 0)
 	{
-		if(buf[0] = 'c' && buf[1] == 'd' && buf[2] == ' ')
+		if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' ')
 		{
-			buf[ft_strlen(buf)-1] = 0;
+			buf[ft_strlen(buf)-1] = '\0';
 			if (chdir(buf + 3) < 0)
 			{
 				ft_putstr_fd ("Error", 2);
@@ -57,8 +62,9 @@ int main(void)
 			continue;
 		}
 		if(forky() == 0)
-			runcmd(parsecmd(buf));
+			runcmd(parsecmd(buf), envp);
 		wait(0);
 	}
+	rl_clear_history();
 	exit(0);
 }

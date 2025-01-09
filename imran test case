@@ -1,7 +1,7 @@
-/// some of the fuck up cases imran share in the terminal which I copy below, and this just echo stuff man. SHIT.
+/// some of the fuck up cases imran share in the terminal which I copy below, and this just echo stuff.
 /// need to take care of space in quote without quote after quotes
 /// if quote dont have closure need to print dquote or quote
-/// this is hard man. so many thing can fuck up. I dont kknow what to do.
+/// this is hard. so many thing can fuck up.
 /// notes guideline : dq = double quote , sq = single quote, after '#' it just my notes for the test case dont care the color.
 /// 4 stage of thing need to be take care of first before execution
 /// 1. get user input
@@ -11,6 +11,7 @@
 ///											#coz if we dont do it right the first time we gonna need to restructure our code from the beginning.
 /// https://m4nnb3ll.medium.com/minishell-building-a-mini-bash-a-42-project-b55a10598218 #this article help a lot
 /// https://www.youtube.com/watch?v=ubt-UjcQUYg #this video is quite useful
+/// https://www.youtube.com/watch?v=SToUyjAsaFk
 
 
 huidris@u80z06s03 ~ %echo hello

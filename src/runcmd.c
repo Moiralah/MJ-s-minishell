@@ -6,13 +6,13 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 02:28:09 by huidris           #+#    #+#             */
-/*   Updated: 2024/12/01 05:52:33 by huidris          ###   ########.fr       */
+/*   Updated: 2025/01/09 05:58:07 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void runcmd(t_cmd *cmd)
+void runcmd(t_cmd *cmd, char **envp)
 {
 	int p[2];
 	t_backg	*bcmd;
@@ -20,6 +20,7 @@ void runcmd(t_cmd *cmd)
 	t_list	*lcmd;
 	t_pipe	*pcmd;
 	t_redir	*rcmd;
+	char *path;
 
 	if(cmd == 0)
 		exit(1);
@@ -29,9 +30,10 @@ void runcmd(t_cmd *cmd)
 		ecmd = (t_exec*)cmd;
 		if (ecmd->argv[0] == 0)
 			exit(1);
-		exec(ecmd->argv[0], ecmd->argv);
+		path = get_path(ecmd->argv[0]);
+		execve(path, ecmd->argv, envp);
 		ft_putstr_fd ("Error", 2);
-		ft_printf(" : exec %s failed\n", ecmd->argv);
+		ft_printf(" : execve %s failed\n", ecmd->argv);
 	}
 	else if(cmd->type == REDIR)
 	{
@@ -43,7 +45,7 @@ void runcmd(t_cmd *cmd)
 			ft_printf(" : open %s failed\n", rcmd->file);
 			exit(1);
 		}
-		runcmd(rcmd->cmd);
+		runcmd(rcmd->cmd, envp);
 	}
 	else if(cmd->type == PIPE)
 	{
@@ -56,7 +58,7 @@ void runcmd(t_cmd *cmd)
 			dup(p[1]);
 			close(p[0]);
 			close(p[1]);
-			runcmd(pcmd->left);
+			runcmd(pcmd->left, envp);
 		}
 		if (forky() == 0)
 		{
@@ -64,7 +66,7 @@ void runcmd(t_cmd *cmd)
 			dup(p[0]);
 			close(p[0]);
 			close(p[1]);
-			runcmd(pcmd->right);
+			runcmd(pcmd->right, envp);
 		}
 		close(p[0]);
 		close(p[1]);
@@ -75,21 +77,48 @@ void runcmd(t_cmd *cmd)
 	{
 		lcmd = (t_list*)cmd;
 		if (forky() == 0)
-			runcmd(lcmd->left);
+			runcmd(lcmd->left, envp);
 		wait(0);
-		runcmd(lcmd->right);
+		runcmd(lcmd->right, envp);
 	}
 	else if(cmd->type == BACKG)
 	{
 		bcmd = (t_backg*)cmd;
 		if (forky == 0)
-			runcmd(bcmd->cmd);
+			runcmd(bcmd->cmd, envp);
 	}
 	else
-		error_exit("runcmd");
+		error_exit("error runcmd");
+
 	exit(0);
-
-
 }
 
+char *get_path(char *argv)
+{
+	char *path;
+	char *full_path;
+	char *env_path;
+	char **paths;
+	int	i;
+
+	env_path = getenv("PATH");
+	if(!env_path)
+		error_exit(" : PATH not found\n");
+	paths = ft_split(env_path, ':');
+	if(!paths)
+		error_exit(" : PATH parsing failed\n");
+	i = 0;
+	while (paths[i])
+	{
+		full_path = ft_strjoin(paths[i], "/");
+		path = ft_strjoin(full_path, argv);
+		free(full_path);
+		i++;
+	}
+	i = 0;
+	while (paths[i])
+		free(paths[i++]);
+	free(paths);
+	return(path);
+}
 
