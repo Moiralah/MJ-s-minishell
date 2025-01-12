@@ -1,3 +1,28 @@
+MINISHELL.H
+
+struct  node
+{
+  union
+  {
+    CD_node  *CD;
+    ...
+    // ... means all the other kinds of node for both the in
+    // -built commands and execve command
+  };
+  struct node  *next;
+}
+
+struct  CD_node
+{
+  // Other XX_node(s) should be made in similar fashion
+  // with variables needed for the run function declared
+  // first, followed last by a run function
+  char  *new_path;
+  void  (*run) (ch *new_path);
+}
+
+-------------------------------------------------------------------------------------
+
 ch  *ft_strip(ch *str, int ch)
 {
   //This function removes character ch from the front and end of sentence str
