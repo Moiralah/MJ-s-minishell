@@ -15,9 +15,9 @@ struct  node
 struct  CD_node
 {
   // Other XX_node(s) should be made in similar fashion
-  // with variables needed for the run function declared
-  // first, followed last by a run function
-  char  *new_path;
+  // with params declared as an array for storing the variables needed
+  // to run the function, followed by a run function
+  char  **params;
   void  (*run) (ch *new_path);
 }
 
@@ -28,9 +28,9 @@ ch  *ft_strip(ch *str, int ch)
   //This function removes character ch from the front and end of sentence str
 }
 
-void  run_CD(char *new_path)
+void  run_CD(char **params)
 {
-  chdir(new_path);
+  chdir(params[0]);
 }
 
 node  *create_CD_node(char *path)
@@ -106,11 +106,19 @@ node  *get_next_nodes(node *current_node, char *comm, int *pid)
   return (current_node->next->next);
 }
 
-void  run_list(char *start)
+void  run_list(node *start)
 {
-  while(start->next != NULL)
+  node  *current;
+  pid_t  pid;
+
+  current = start->next;
+  while(current != NULL)
   {
-    // Still thinking how to do it
+    pid = fork()
+    if (pid == 0)
+      current->type->run(current->type->params);
+    waitpid(0);
+    current = current->next;
   }
 }
 
