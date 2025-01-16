@@ -16,7 +16,7 @@ FLAGS	= -Wall -Wextra -Werror #-fsanitize=address -g3 -ggdb
 
 CC		= gcc
 
-SRC_DIR		= src
+SRC_DIR		= src2
 SRC			= $(wildcard $(SRC_DIR)/*.c)
 
 LIBFT 		= libft
