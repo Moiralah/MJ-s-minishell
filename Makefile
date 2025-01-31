@@ -12,20 +12,20 @@
 
 NAME	= minishell
 
-FLAGS	= -Wall -Wextra -Werror #-fsanitize=address -g3 -ggdb
+FLAGS	= -Wall -Wextra -Werror#-fsanitize=address -g3 -ggdb
 
-CC		= gcc
+CC	= gcc
 
-SRC_DIR		= src2
-SRC			= $(wildcard $(SRC_DIR)/*.c)
+SRC_DIR	= code
+SRC	= $(wildcard $(SRC_DIR)/*.c)
 
-LIBFT 		= libft
-LIBFT_A 	= libft/libft.a
+LIBFT 	= libft
+LIBFT_A	= libft/libft.a
 
-OBJ_DIR 	= obj
-OBJS		= $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
+OBJ_DIR	= obj
+OBJS	= $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 
-LINKS		= -lft -L libft
+LINKS	= -lft -L libft
 
 $(NAME): $(OBJS) $(LIBFT_A)
 	$(CC) $(FLAGS) $(OBJS) $(LINKS) -o $@
@@ -36,6 +36,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 $(LIBFT_A):
 	make -C $(LIBFT)
+
+.PHONY: all, clean, fclean, re
 
 all: $(NAME)
 
@@ -51,5 +53,3 @@ fclean: clean
 	clear
 
 re: fclean all
-
-.PHONY: all, clean, fclean, re
