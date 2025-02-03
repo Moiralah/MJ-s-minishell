@@ -1,5 +1,11 @@
 #include "minishell.h"
 
+void	error_exit(const char *msg)
+{
+	perror(msg);
+	exit(1);
+}
+
 /* t_nodes	linking(t_node cur_node, char *comm, int *pid)
 {
 	t_nodes	*rd_node;
