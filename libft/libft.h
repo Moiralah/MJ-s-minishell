@@ -6,7 +6,7 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/27 23:01:21 by huidris           #+#    #+#             */
-/*   Updated: 2024/09/19 01:58:00 by huidris          ###   ########.fr       */
+/*   Updated: 2025/02/04 01:51:57 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,5 +72,6 @@ char	*buffer_add(char *buffer_all, char *buffer);
 char	*read_file(char *buffer_all, int fd);
 char	*extract_line(char *buffer_all, int check);
 char	*get_next_line(int fd);
+void	free2d(char **str);
 
 #endif

@@ -6,7 +6,7 @@
 #    By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/15 00:22:43 by huidris           #+#    #+#              #
-#    Updated: 2024/09/19 01:48:33 by huidris          ###   ########.fr        #
+#    Updated: 2025/02/04 01:52:17 by huidris          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -56,6 +56,7 @@ files 	   = ft_strlen \
 			 ft_printf \
 			 ft_strjoingnl \
 			 get_next_line \
+			 free2d \
 
 Compiler	= gcc
 
