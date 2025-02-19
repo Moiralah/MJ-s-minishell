@@ -28,7 +28,7 @@ OBJS	= $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 LINKS	= -lft -L libft
 
 $(NAME): $(OBJS) $(LIBFT_A)
-	$(CC) $(FLAGS) $(OBJS) $(LINKS) -o $@
+	$(CC) $(FLAGS) $(OBJS) $(LINKS) -o $@ -lreadline
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(OBJ_DIR)
