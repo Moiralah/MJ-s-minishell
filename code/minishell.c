@@ -1,59 +1,47 @@
 #include "minishell.h"
 
-char	*fnames_to_list(char *comm, char ch, int start)
+char	*fnames_to_nodes(t_node cur_node, char *comm, char ch)
 {
-	char	**fnames;
+	char	*fname;
+	char	*start;
 	int		word_s;
 	int		i;
-	int		q;
 
-	fnames = ft_calloc(count_ch(comm, ch) + 2, sizeof(char *));
-	word_s = -1;
 	i = 0;
-	q = -1;
-	while (start >= 0)
+	word_s = 0;
+	start = ft_strchr(comm, ch);
+	while (start[++i] != '\0')
 	{
-		if (word_s > 0)
+		if (word_s)
 		{
-			i = get_end(comm, word_s);
-			fnames[++q] = ft_substr(comm, word_s, i - 1 - word_s);
-			comm = remove(comm, start, i);
-			start = ft_strchr(comm, ch);
-			word_s = -1;
-			i = 0;
+			i = word_end(start + word_s, " <>", 1);
+			fname = ft_substr(start, word_s, i - word_s);
+			if (start[0] == start[1])
+				cur_node->next = create_redir_node(ch + 1, fname);
+			else
+				cur_node->next = create_redir_node(ch, fname);
+			comm = strnrplc(comm, NULL, comm - start, i - word_s);
 		}
-		else if (ft_isprint(comm[start + (++i)]) || (comm[start + i] != ' '))
-			word_s = start + i;
+		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))
+			word_s = i;
 	}
-	fnames[++q] = comm;
-	return (fnames);
+	return (comm);
 }
 
-t_node	linking(t_node cur_node, char **envp, char *comm, int *pid)
+t_node	linking(t_node cur_node, char **envp, char *comm)
 {
-	char	**in;
-	char	**out;
-	char	*final_command;
-	int		i;
+	char	*input;
 
-	in = fnames_to_list(comm, '<', ft_strchr(comm, '<'));
-	i = -1;
-	while (++i < (strlist_len(in) - 1))
-	{
-		cur_node->next = create_redir_node("<", in[i], pid);
+	comm = fnames_to_node(cur_node, comm, '<');
+	while (cur_node->next != NULL)
 		cur_node = cur_node->next;
-	}
-	out = fnames_to_list(in[strlist_len(in) - 1], '>', ft_strchr(comm, '>'));
-	free(in);
-	i = -1;
-	while (++i < (strlist_len(out) - 1))
-	{
-		cur_node->next = create_redir_node(">", out[i], pid);
+	input = cur_node->params[1];
+	comm = fnames_to_list(cur_node, comm, '>');
+	while (cur_node->next != NULL)
 		cur_node = cur_node->next;
-	}
-	final_command = out[strlist_len(out) - 1];
-	free(out);
-	cur_node->next = create_exec_node(final_command, envp);
+	if (ft_strncmp(input, cur_node->params[1], ft_strlen(input)) == 0)
+		error_exit(-1);
+	cur_node->next = function_matching(comm, envp);
 	return (cur_node->next);
 }
 
@@ -61,27 +49,28 @@ void	executing(t_node start_node)
 {
 	t_node	cur_node;
 	pid_t	pid;
+	int		fd[2];
 
 	cur_node = start_node->next;
+	pipe(fd);
 	while (cur_node != NULL)
 	{
+		dup2(fd[0], stdout);
+		dup2(fd[1], stdin);
 		pid = fork();
 		if (pid < 0)
 			error_exit(strerror(errno));
 		else if (pid == 0)
+		{
+			close(fd[0]);
+			close(fd[1]);
 			cur_node->run(cur_node->params);
+		}
 		else
 		{
-			if (wait() < 0)
-				error_exit(strerror(errno));
+			waitpid(pid, NULL, 0);
 			cur_node = cur_node->next;
 		}
-	}
-	while (start_node != NULL)
-	{
-		cur_node = start_node;
-		start_node = start_node->next;
-		free(cur_node);
 	}
 }
 
@@ -90,25 +79,26 @@ void	listening(char **envp)
 	t_node	*nodes[2];
 	char	**comms;
 	char	*line;
-	int		pid[2];
 	int		i;
 
 	i = -1;
 	line = readline(getcwd(NULL, 0));
 	add_history(line);
-	pipe(pid, O_CLOEXEC);
 	comms = ft_split(line, '|');
 	free (line);
 	nodes[1] = create_generic_node();
 	nodes[0] = nodes[1];
 	while (comms[++i] != '\0')
-	{
-		dup2(pid[0], stdout);
-		dup2(pid[1], stdin);
-		nodes[1] = linking(nodes[1], comms[i], pid);
-	}
+		nodes[1] = linking(nodes[1], comms[i]);
 	free(comms);
 	executing(nodes[0]);
+	// free envp list here
+	while (nodes[0] != NULL)
+	{
+		nodes[1] = nodes[0];
+		nodes[0] = nodes[0]->next;
+		free(nodes[1]);
+	}
 }
 
 int	main(int argc, char **argv, char **envp)

@@ -2,13 +2,19 @@
 
 void	run_cd(char **params)
 {
-	if (chdir(params[0]) < 0)
+	if (chdir(params[1]) < 0)
 		error_exit(errno);
+	free_strlist(params, -1);
 }
 
 void	run_echo(char **params)
 {
-	printf("%s", params[0]);
+	int	i;
+
+	i = 0;
+	while (params[++i] != "\0")
+		printf("%s ", params[i]);
+	free_strlist(params, -1);
 }
 
 void	run_pwd(char **params)
@@ -25,12 +31,14 @@ void	run_pwd(char **params)
 
 void	run_export(char **params)
 {
-	if (setenv(params[0], params[1], 1) < 0)
+	if (setenv(params[1], params[2], 1) < 0)
 		error_exit(errno);
+	free_strlist(params, -1);
 }
 
 void	run_unset(char **params)
 {
 	if (unsetenv(params[0]) < 0)
 		error_exit(errno);
+	free_strlist(params, -1);
 }

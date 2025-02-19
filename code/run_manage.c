@@ -7,7 +7,7 @@ void	run_redir(char **params)
 	if (params[0][0] == '<')
 		fd = open(params[1], O_CREAT, O_RDONLY);
 	else if (params[0][0] == '=')
-		fd = 1;
+		fd = heredoc(ft_strtrim(params[1], " "));
 	else if (params[0][0] == '>')
 		fd = open(params[1], O_CREAT, O_WRONLY);
 	else if (params[0][0] == '?')
@@ -15,11 +15,11 @@ void	run_redir(char **params)
 	free (params[1]);
 	if (fd == -1)
 		error_exit(errno);
-	if (params[0][0] == '<')
-		dup2(((int *)params[2])[0], fd);
-	else if ((params[0][0] == '>') && (params[0][0] == '?'))
-		dup2(((int *)params[2])[1], fd);
-	free(params[1]);
+	if ((params[0][0] == '<') || (params[0][0] == '='))
+		dup2(fd, stdin);
+	else if ((params[0][0] == '>') || (params[0][0] == '?'))
+		dup2(fd, stdout);
+	close(fd);
 }
 
 void	run_env(char **params)

@@ -53,21 +53,26 @@ int	count_ch(char *str, char ch)
 	return (cnt);
 }
 
-int	get_end(char *comm, int index)
+int	word_end(char *word, char *end_set, int print)
 {
 	int	i;
+	int	q;
 
 	i = -1;
-	if (comm[index] == '"')
-		return (ft_strchr(comm + index, '"'));
-	while (comm[index + (++i)] != "\0")
+	q = 0;
+	if (word[++i] == '"')
+		return (ft_strchr(word, '"') - word);
+	while (word[i] != "\0")
 	{
-		if ((comm[index + i] == '<') || (comm[index + i] == '>'))
-			return (index + i);
-		if ((!ft_isprint(comm[index + i])) || (comm[index + i] == ' '))
-			return (index + i);
+		if (print) && (!ft_isprint(word[i]))
+			return (i);
+		while ((end_set[q] != '\0') && (end_set[q] != word[i]))
+			q++;
+		if (end_set[q] == word[i])
+			return (i);
+		i++;
 	}
-	return (index + i);
+	return (i);
 }
 
 void	free_strlist(char **strlist, int index)
