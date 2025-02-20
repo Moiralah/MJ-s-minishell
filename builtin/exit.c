@@ -6,7 +6,7 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 22:33:03 by huidris           #+#    #+#             */
-/*   Updated: 2025/02/21 04:22:58 by huidris          ###   ########.fr       */
+/*   Updated: 2025/02/21 04:26:27 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,4 +51,30 @@ void	run_exit(int argc, char **argv, t_node *node)
 		node->exit_status = 2;
 		exit(node->exit_status);
 	}
+}
+
+// tried to push under ft_atoi under libft using main branch but it was rejected
+static long	ft_atol(const char *str)
+{
+	int		i;
+	long	num;
+	int		sign;
+
+	i = 0;
+	num = 0;
+	sign = 1;
+	while ((str[i] >= 9 && str[i] <= 13) || str[i] == ' ')
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+	{
+		if (str[i] == '-')
+			sign = -1;
+		i++;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		num = num * 10 + str[i] - '0';
+		i++;
+	}
+	return (num * sign);
 }
