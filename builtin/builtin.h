@@ -6,7 +6,7 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 13:28:27 by huidris           #+#    #+#             */
-/*   Updated: 2025/02/20 23:17:36 by huidris          ###   ########.fr       */
+/*   Updated: 2025/02/21 05:25:34 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define BUILTIN_H
 # include "../libft/libft.h"
 # include "minishell.h"
+# include <signal.h>
 
 void	error_exit(const char *msg);
 char	**copy2d(char **array);
@@ -29,6 +30,11 @@ void	run_unset(char **argv, t_node *node);
 void	free_env_node(char *key, char *val);
 void	run_exit(int argc, char **argv, t_node *node);
 int		legitnum(char *argv);
+
+void	sigint_handler(int signo);
+void	sigquit_handler(int signo);
+void	init_signal(void);
+void	restore_signal(void);
 
 /////// UTILITY ///////
 
