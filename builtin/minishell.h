@@ -16,6 +16,7 @@ typedef struct s_env_node
 typedef struct s_nodes
 {
 	t_env_node		*env;
+	long			exit_status;
 	char 			*params;
 	int				(*run)(char *params);
 	struct s_nodes	*next;

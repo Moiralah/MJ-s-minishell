@@ -6,7 +6,7 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 13:28:27 by huidris           #+#    #+#             */
-/*   Updated: 2025/02/19 00:15:16 by huidris          ###   ########.fr       */
+/*   Updated: 2025/02/20 23:17:36 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ void	run_pwd();
 void	run_export(char **argv, t_node *node);
 void	run_unset(char **argv, t_node *node);
 void	free_env_node(char *key, char *val);
+void	run_exit(int argc, char **argv, t_node *node);
+int		legitnum(char *argv);
 
 /////// UTILITY ///////
 
