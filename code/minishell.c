@@ -1,31 +1,45 @@
 #include "minishell.h"
 
-char	*fnames_to_nodes(t_node cur_node, char *comm, char ch)
+void	executing(t_node start_node)
 {
-	char	*fname;
-	char	*start;
-	int		word_s;
-	int		i;
+	t_node	cur_node;
+	pid_t	pid[2];
+	int		fd[2];
 
-	i = 0;
-	word_s = 0;
-	start = ft_strchr(comm, ch);
-	while (start[++i] != '\0')
+	cur_node = start_node->next;
+	pipe(fd);
+	while (cur_node != NULL)
 	{
-		if (word_s)
+		dup2(fd[0], stdout);
+		dup2(fd[1], stdin);
+		pid[0] = fork();
+		if (pid[0] < 0)
+			error_exit(strerror(errno));
+		else if (pid[0] == 0)
 		{
-			i = word_end(start + word_s, " <>", 1);
-			fname = ft_substr(start, word_s, i - word_s);
-			if (start[0] == start[1])
-				cur_node->next = create_redir_node(ch + 1, fname);
-			else
-				cur_node->next = create_redir_node(ch, fname);
-			comm = strnrplc(comm, NULL, comm - start, i - word_s);
+			dup2(fd[1], STDOUT_FILENO);
+			close(fd[0]);
+			close(fd[1]);
+			cur_node->run(cur_node->params);
 		}
-		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))
-			word_s = i;
+		pid[1] = fork();
+		if (pid[1] < 0)
+			error_exit(strerror(errno));
+		else if (pid[1] == 0)
+		{
+			cur_node = cur_node->next;
+			dup2(fd[0], STDOUT_FILENO);
+			close(fd[0]);
+			close(fd[1]);
+			cur_node->run(cur_node->params);
+		}
+		if ((pid[0] != 0) && (pid[1] != 0))
+		{
+			waitpid(pid[0], NULL, 0);
+			waitpid(pid[1], NULL, 0);
+			cur_node = cur_node->next->next;
+		}
 	}
-	return (comm);
 }
 
 t_node	linking(t_node cur_node, char **envp, char *comm)
@@ -45,53 +59,23 @@ t_node	linking(t_node cur_node, char **envp, char *comm)
 	return (cur_node->next);
 }
 
-void	executing(t_node start_node)
-{
-	t_node	cur_node;
-	pid_t	pid;
-	int		fd[2];
-
-	cur_node = start_node->next;
-	pipe(fd);
-	while (cur_node != NULL)
-	{
-		dup2(fd[0], stdout);
-		dup2(fd[1], stdin);
-		pid = fork();
-		if (pid < 0)
-			error_exit(strerror(errno));
-		else if (pid == 0)
-		{
-			close(fd[0]);
-			close(fd[1]);
-			cur_node->run(cur_node->params);
-		}
-		else
-		{
-			waitpid(pid, NULL, 0);
-			cur_node = cur_node->next;
-		}
-	}
-}
-
-void	listening(char **envp)
+void	initialising(chra **comms, char **envp)
 {
 	t_node	*nodes[2];
 	char	**comms;
-	char	*line;
 	int		i;
 
 	i = -1;
-	line = readline(getcwd(NULL, 0));
-	add_history(line);
-	comms = ft_split(line, '|');
-	free (line);
-	nodes[1] = create_generic_node();
-	nodes[0] = nodes[1];
 	while (comms[++i] != '\0')
+	{
 		nodes[1] = linking(nodes[1], comms[i]);
+		if (i == 0)
+			nodes[0] = nodes[1];
+	}
 	free(comms);
 	executing(nodes[0]);
+	add_history(line);
+	free(line);
 	// free envp list here
 	while (nodes[0] != NULL)
 	{
@@ -101,12 +85,39 @@ void	listening(char **envp)
 	}
 }
 
+char	*listening(int i, int q)
+{
+	char	*line;
+
+	line = readline("MJ > ");
+	while (line[i] != "\0")
+	{
+		q = 0;
+		if ((line[i] == '"') && ft_strchr(line + i + 1, '"'))
+			i = ft_strchr(line + i + 1, '"') - line;
+		else if ((line[i] == '"') && !ft_strchr(line + i + 1, '"'))
+			q = 1;
+		else if ((line[i] == ''') && ft_strchr(line + i + 1, '''))
+			i = ft_strchr(line + i + 1, 39) - line;
+		else if ((line[i] == ''') && !ft_strchr(line + i + 1, '''))
+			q = 1;
+		if (q)
+		{
+			line = ft_strjoin(line, "\n");
+			line = ft_strjoin(line, readline("> "));
+		}
+		else
+			i++;
+	}
+	return (line);
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	int	running;
 
 	running = 1;
 	while (running)
-		listening(envp);
+		initialising(ft_split(listening(0, 0), '|'), envp);
 	return (0);
 }

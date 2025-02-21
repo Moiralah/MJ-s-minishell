@@ -1,13 +1,18 @@
 #include "minishell.h"
 
-void	run_redir(char **params)
+void	run_pipe(void)
+{
+	
+}
+
+int	run_redir(char **params)
 {
 	int	fd;
 
 	if (params[0][0] == '<')
 		fd = open(params[1], O_CREAT, O_RDONLY);
 	else if (params[0][0] == '=')
-		fd = heredoc(ft_strtrim(params[1], " "));
+		heredoc(params[1]);
 	else if (params[0][0] == '>')
 		fd = open(params[1], O_CREAT, O_WRONLY);
 	else if (params[0][0] == '?')
@@ -15,11 +20,15 @@ void	run_redir(char **params)
 	free (params[1]);
 	if (fd == -1)
 		error_exit(errno);
-	if ((params[0][0] == '<') || (params[0][0] == '='))
+	if (params[0][0] == '<')
 		dup2(fd, stdin);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
 		dup2(fd, stdout);
-	close(fd);
+	else
+		dup2(stdin, stdin);
+	if (params[0][0] != '=')
+		return (close(fd), 0);
+	return (1);
 }
 
 void	run_env(char **params)

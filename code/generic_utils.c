@@ -24,61 +24,45 @@ t_node	function_matching(char *str, char **envp)
 	return (create_exec_node(comm_n_flags, envp));
 }
 
-char	*expansion(char *str)
+char	*fnames_to_nodes(t_node cur_node, char *comm, char ch)
 {
+	char	*fname;
 	char	*start;
-	char	*var_name;
-	char	*var_val;
+	int		word_s;
 	int		i;
 
 	i = 0;
-	start = ft_strchr(str, '$');
+	word_s = 0;
+	start = ft_strchr(comm, ch);
 	while (start[++i] != '\0')
 	{
-		var_name = NULL;
-		if (start[i] == '?')
-			printf("Exit Status Code: 1\n");
-		else if ((start[i] == ' ') || (start[i] == '$'))
-			var_name = ft_substr(start, 1, i - 1);
-		if (!var_name)
-			continue ;
-		var_val = ft_getenv(var_name);
-		free(var_name);
-		strnrplc(str, var_val, str - start, i - 1);
-		start = ft_strchr(str, '$');
-		i = 0;
+		if (word_s)
+		{
+			i = word_end(start + word_s, " <>", 1);
+			fname = ft_substr(start, word_s, i - word_s);
+			if (start[0] == start[1])
+				cur_node->next = create_redir_node(ch + 1, fname);
+			else
+				cur_node->next = create_redir_node(ch, fname);
+			comm = strnrplc(comm, NULL, comm - start, i - word_s);
+		}
+		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))
+			word_s = i;
 	}
+        return (comm);
 }
 
-char	*strnrplc(char *str, char *replace, int start, int len)
-{
-	char	*before;
-	char	*after;
-
-	before = ft_substr(str, 0, start);
-	after = ft_substr(str, start + len, ft_strlen(str) - start - len);
-	str = ft_strjoin(before, replace);
-	str = ft_strjoin(str, after);
-	return (str);
-}
-
-int	heredoc(char *str)
+void	heredoc(char *str)
 {
 	char	*line;
 	char	*input;
-	int		fd;
 
-	line = readline();
-	input = ft_strjoin(input, line);
+	line = readline(">");
 	while (ft_strncmp(line, str, ft_strlen(str)) != 0)
 	{
-		line = readline();
-		input = ft_strjoin(input, line);
+		free(line);
+		line = readline(">");
 	}
-	free(str);
-	fd = open("temp.txt", O_CREATE, O_WRONLY);
-	write(fd, input, ft_strlen(input));
-	return (fd);
 }
 
 void	error_exit(int errno)

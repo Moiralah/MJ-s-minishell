@@ -28,6 +28,18 @@ char	**strlist_join(char **list, char **list_to_join, int marker, int free)
 	return (new_list);
 }
 
+char	*strnrplc(char *str, char *replace, int start, int len)
+{
+	char	*before;
+	char	*after;
+
+	before = ft_substr(str, 0, start);
+	after = ft_substr(str, start + len, ft_strlen(str) - start - len);
+	str = ft_strjoin(before, replace);
+	str = ft_strjoin(str, after);
+	return (str);
+}
+
 int	strlist_len(char **strlist)
 {
 	int	i;
@@ -36,21 +48,6 @@ int	strlist_len(char **strlist)
 	while (strlist[i] != NULL)
 		i++;
 	return (i);
-}
-
-int	count_ch(char *str, char ch)
-{
-	int	cnt;
-	int	i;
-
-	cnt = 0;
-	i = -1;
-	while (str[++i] != "\0")
-	{
-		if (str[i] == ch)
-			cnt++;
-	}
-	return (cnt);
 }
 
 int	word_end(char *word, char *end_set, int print)
@@ -64,7 +61,7 @@ int	word_end(char *word, char *end_set, int print)
 		return (ft_strchr(word, '"') - word);
 	while (word[i] != "\0")
 	{
-		if (print) && (!ft_isprint(word[i]))
+		if (print && (!ft_isprint(word[i])))
 			return (i);
 		while ((end_set[q] != '\0') && (end_set[q] != word[i]))
 			q++;

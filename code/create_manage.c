@@ -1,12 +1,12 @@
 #include "minishell.h"
 
-t_node	create_generic_node(void)
+t_node	create_pipe_node(void)
 {
 	t_node	new_node;
 
 	new_node = ft_calloc(1, sizeof(t_node));
 	new_node->params = NULL;
-	new_node->run = NULL;
+	new_node->run = run_pipe(void);
 	return (new_node);
 }
 
