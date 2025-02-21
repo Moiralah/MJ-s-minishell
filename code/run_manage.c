@@ -1,11 +1,11 @@
 #include "minishell.h"
 
-void	run_pipe(void)
+int	run_pipe(char **params, t_list *envp)
 {
-	
+	return (0);
 }
 
-int	run_redir(char **params)
+int	run_redir(char **params, t_list *envp)
 {
 	int	fd;
 
@@ -31,33 +31,64 @@ int	run_redir(char **params)
 	return (1);
 }
 
-void	run_env(char **params)
+int	run_env(char **params, t_list *envp)
 {
-	int	i;
+	t_list	*temp;
 
-	i = -1;
-	while (params[++i] != "\0")
-		printf("%s\n", params[i]);
+	run_export(params + 1, envp);
+	temp = envp;
+	while (temp != NULL)
+	{
+		printf("%s=%s\n", temp->key, temp->val);
+		temp = temp->next;
+	}
+	run_unset(params + 1, envp);
+	free2d(params);
+	return (0);
 }
 
-void	run_exec(char **params)
+int	run_exec(char **params, t_list *envp)
 {
-	char	**com_flags;
-	int		i;
+	t_list	*temp;
+	char	**arr_envp;
+	char	*line;
+	int		len;
 
-	i = strlist_len(params);
-	com_flags = malloc(sizeof(char *) * (i + 1));
-	com_flags[i] = "\0";
-	while (--i >= 0)
-		com_flags[i] = params[i];
-	i = execve(com_flags[0], com_flags, params + strlist_len(params) < 0);
-	free (params);
-	free (com_flags);
-	if (i == -1)
+	len = 0;
+	temp = envp;
+	while (temp != NULL)
+		len++;
+	arr_envp = ft_calloc(len + 1, sizeof(char *));
+	arr_envp[len] = NULL;
+	temp = envp;
+	while (strlist_len(arr_envp) < len)
+	{
+		line = ft_strjoin(temp->key, "=");
+		arr_envp[strlist_len(arr_envp)] = ft_strjoin(line, temp->val);
+		temp = temp->next;
+	}
+	if (execve(com_flags[0], params, arr_envp) < 0)
 		error_exit(errno);
+	return (0);
 }
 
-void	run_exit(char **params)
+int	run_exit(char **params, t_list *envp)
 {
-	exit(1);
+	int	isnum;
+
+	isnum = 0;
+	if (strlist_len(params) == 1)
+		exit(0);
+	if ((params[1][0] == '-') || (params[1][0] == '+'))
+		params[1]++;
+	else if ((strlist_len(params) == 2) && ft_isdigit(params[1]))
+		exit(ft_atoi(params[1]));
+	else if ((strlist_len(params) >= 2) && ft_isdigit(params[1]))
+		return (printf("bash: exit: too many arguments\n"), 0);
+	else
+	{
+		printf("bash: exit: %s: numeric argument required", params[1]);
+		exit(2);
+	}
+	return (0);
 }

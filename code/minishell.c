@@ -6,7 +6,7 @@ void	executing(t_node start_node)
 	pid_t	pid[2];
 	int		fd[2];
 
-	cur_node = start_node->next;
+	cur_node = start_node;
 	pipe(fd);
 	while (cur_node != NULL)
 	{
@@ -42,7 +42,7 @@ void	executing(t_node start_node)
 	}
 }
 
-t_node	linking(t_node cur_node, char **envp, char *comm)
+t_node	linking(t_node cur_node, char *comm)
 {
 	char	*input;
 
@@ -55,7 +55,7 @@ t_node	linking(t_node cur_node, char **envp, char *comm)
 		cur_node = cur_node->next;
 	if (ft_strncmp(input, cur_node->params[1], ft_strlen(input)) == 0)
 		error_exit(-1);
-	cur_node->next = function_matching(comm, envp);
+	cur_node->next = function_matching(comm);
 	return (cur_node->next);
 }
 
@@ -73,10 +73,10 @@ void	initialising(chra **comms, char **envp)
 			nodes[0] = nodes[1];
 	}
 	free(comms);
+	nodes[0]->envp = init_envp(envp);
 	executing(nodes[0]);
-	add_history(line);
-	free(line);
-	// free envp list here
+	while (nodes[0]->envp != NULL)
+		remove_link(nodes[0]->envp, nodes[0]->envp, NULL);
 	while (nodes[0] != NULL)
 	{
 		nodes[1] = nodes[0];
@@ -117,6 +117,8 @@ int	main(int argc, char **argv, char **envp)
 	int	running;
 
 	running = 1;
+	if ((argc > 1) && (argv != NULL))
+		return (printf("Don't give any args"), -1);
 	while (running)
 		initialising(ft_split(listening(0, 0), '|'), envp);
 	return (0);

@@ -17,7 +17,7 @@ int	main(void)
 	limit = 2;
 	while (++i < limit)
 	{
-		if(i == 0)
+		if (i == 0)
 			pipe(old_fd);
 		else if (i == 1)
 			pipe(new_fd);

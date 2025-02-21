@@ -49,7 +49,7 @@ char	*fnames_to_nodes(t_node cur_node, char *comm, char ch)
 		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))
 			word_s = i;
 	}
-        return (comm);
+	return (comm);
 }
 
 void	heredoc(char *str)
@@ -63,6 +63,17 @@ void	heredoc(char *str)
 		free(line);
 		line = readline(">");
 	}
+}
+
+void	remove_link(t_list *head, t_list *cur, t_list *prev)
+{
+	free(cur->key);
+	free(cur->val);
+	if (cur == head)
+		head = head->next;
+	else
+		prev->next = cur->next;
+	free(cur);
 }
 
 void	error_exit(int errno)
