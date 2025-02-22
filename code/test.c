@@ -1,63 +1,53 @@
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 #include <sys/wait.h>
 
-int	main(void)
+int	main()
 {
-	int	new_fd[2];
-	int	old_fd[2];
-	int	pid;
-	int	limit;
+	pid_t	pid;
+	//int	new_fd[2];
+	int	fd[4];
 	int	i;
 
 	i = -1;
-	limit = 2;
-	while (++i < limit)
+	while (++i < 2)
+		pipe(fd + 2 * i);
+	i = -1;
+	while (++i < 3)
 	{
-		if (i == 0)
-			pipe(old_fd);
-		else if (i == 1)
-			pipe(new_fd);
-		printf("Running\n");
 		pid = fork();
 		if (pid == 0)
 		{
-			printf("In Pipe |");
-			printf(" Process %d\n", i);
-			if (i != 0)
-				dup2(old_fd[0], STDIN_FILENO);
-			if (i != limit - 1)
-				dup2(old_fd[1], STDOUT_FILENO);
 			if (i == 0)
 			{
-				close(old_fd[0]);
-				close(old_fd[1]);
+				dup2(fd[1], STDOUT_FILENO);
+				int	q = -1;
+				while (++q < 4)
+					close(fd[q]);
 				execlp("ls", "ls", NULL);
-			}
-			else if (i == (limit - 1))
-			{
-				close(new_fd[0]);
-				close(new_fd[1]);
-				execlp("grep", "grep", "mini", NULL);
-			}
-		}
-		if (pid != 0)
-		{
-			if (i == 0)
-			{
-				close(old_fd[0]);
-				close(old_fd[1]);
 			}
 			else if (i == 1)
 			{
-				close(new_fd[0]);
-				close(new_fd[1]);
+				dup2(fd[0], STDIN_FILENO);
+				dup2(fd[3], STDOUT_FILENO);
+				int	q = -1;
+				while (++q < 4)
+					close(fd[q]);
+				execlp("grep", "grep", ".c", NULL);
 			}
-			waitpid(pid, NULL, 0);
+			else if (i == 2)
+			{
+				dup2(fd[2], STDIN_FILENO);
+				int	q = -1;
+				while (++q < 4)
+					close(fd[q]);
+				execlp("wc", "wc", "-l", NULL);
+			}
 		}
 	}
-	return (0);
+	i  = -1;
+	while (++i < 4)
+		close(fd[i]);
+	waitpid(-1, NULL, 0);
 }

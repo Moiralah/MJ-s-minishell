@@ -1,45 +1,42 @@
 #include "minishell.h"
 
-void	executing(t_node start_node)
+void	executing(t_node start_node, int i)
 {
 	t_node	cur_node;
-	pid_t	pid[2];
-	int		fd[2];
+	pid_t	pid;
+	int		*fd;
+	int		q;
 
 	cur_node = start_node;
-	pipe(fd);
-	while (cur_node != NULL)
+	fd = ft_calloc((i - 1) * 2, sizeof(int));
+	q = -1;
+	while (++q < (i - 1))
+		pipe(fd + (2 * q));
+	q = 0;
+	while ((cur_node != NULL) && (++q))
 	{
-		dup2(fd[0], stdout);
-		dup2(fd[1], stdin);
-		pid[0] = fork();
-		if (pid[0] < 0)
+		pid = fork();
+		if (pid < 0)
 			error_exit(strerror(errno));
-		else if (pid[0] == 0)
-		{
+		else if ((pid == 0) && (q == 1))
 			dup2(fd[1], STDOUT_FILENO);
-			close(fd[0]);
-			close(fd[1]);
-			cur_node->run(cur_node->params);
-		}
-		pid[1] = fork();
-		if (pid[1] < 0)
-			error_exit(strerror(errno));
-		else if (pid[1] == 0)
+		else if ((pid == 0) && (q == i))
+			dup2(fd[(q * 2) - 4], STDIN_FILENO);
+		else if (pid == 0)
 		{
-			cur_node = cur_node->next;
-			dup2(fd[0], STDOUT_FILENO);
-			close(fd[0]);
-			close(fd[1]);
-			cur_node->run(cur_node->params);
+			dup2(fd[(2 * q) - 4], STDIN_FILENO);
+			dup2(fd[(2 * q) - 1], STDOUT_FILENO);
 		}
-		if ((pid[0] != 0) && (pid[1] != 0))
+		if (pid == 0)
 		{
-			waitpid(pid[0], NULL, 0);
-			waitpid(pid[1], NULL, 0);
-			cur_node = cur_node->next->next;
+			close_pipe(fd, (i - 1) * 2);
+			cur_node->run(cur_node->params);
+			break;
 		}
+		cur_node = cur_node->next;
 	}
+	close_pipe(fd, (i - 1) * 2);
+	waitpid(-1, NULL, 0);
 }
 
 t_node	linking(t_node cur_node, char *comm)
@@ -74,7 +71,7 @@ void	initialising(chra **comms, char **envp)
 	}
 	free(comms);
 	nodes[0]->envp = init_envp(envp);
-	executing(nodes[0]);
+	executing(nodes[0], i);
 	while (nodes[0]->envp != NULL)
 		remove_link(nodes[0]->envp, nodes[0]->envp, NULL);
 	while (nodes[0] != NULL)

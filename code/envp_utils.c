@@ -55,3 +55,12 @@ void	ft_setenv(t_list *envp, char *key, char *val, int overwrite)
 	new->next = NULL;
 	temp->next = new;
 }
+
+void	close_pipe(int *pipe, int len)
+{
+	int	i;
+
+	i = -1;
+	while (++i < len)
+		close(pipe[i]);
+}
