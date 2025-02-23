@@ -30,13 +30,18 @@ void	executing(t_node start_node, int i)
 		if (pid == 0)
 		{
 			close_pipe(fd, (i - 1) * 2);
-			cur_node->run(cur_node->params);
-			break;
+			if (cur_node->run(cur_node->params) == 1)
+			{
+				free(line);
+				line = strjoin_n_gnl(STDOUT_FILENO);
+			}
+			kill(0, SIGKILL);
 		}
 		cur_node = cur_node->next;
 	}
 	close_pipe(fd, (i - 1) * 2);
 	waitpid(-1, NULL, 0);
+	add_history(line);
 }
 
 t_node	linking(t_node cur_node, char *comm)
@@ -64,6 +69,7 @@ void	initialising(char **comms, char **envp)
 	i = -1;
 	while (comms[++i] != '\0')
 	{
+		expansion(comms[i]);
 		nodes[1] = linking(nodes[1], comms[i]);
 		if (i == 0)
 			nodes[0] = nodes[1];
@@ -110,12 +116,17 @@ char	*listening(int i, int q)
 
 int	main(int argc, char **argv, char **envp)
 {
+	char	*input;
 	int	running;
 
 	running = 1;
 	if ((argc > 1) && (argv != NULL))
 		return (printf("Don't give any args"), -1);
 	while (running)
-		initialising(ft_split(listening(0, 0), '|'), envp);
+	{
+		input = listening(0, 0);
+		initialising(ft_split(input, '|'), envp);
+		free(input);
+	}
 	return (0);
 }

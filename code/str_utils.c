@@ -1,31 +1,29 @@
 #include "minishell.h"
 
-char	**strlist_join(char **list, char **list_to_join, int marker, int free)
+char	*expansion(char *str)
 {
-	char	**new_list;
+	char	*start;
+	char	*var_name;
+	char	*var_val;
 	int		i;
-	int		q;
 
-	i = strlist_len(list);
-	if (marker)
-		i += 1;
-	q = strlist_len(list_to_join);
-	new_list = malloc(sizeof(char *) * (i + q + 1));
-	new_list[i + q] = "\0";
-	while ((i + q) > 0)
+	i = 0;
+	start = ft_strchr(str, '$');
+	while (start[++i] != '\0')
 	{
-		if (q > 0)
-			new_list[i + q] = list_to_join[--q];
-		else if ((q == 0) && (marker--))
-			new_list[--i] = "\0";
-		else if (i > 0)
-			new_list[i] = strlist[--i];
+		var_name = NULL;
+		if (start[i] == '?')
+			printf("Exit Status Code: 1\n");
+		else if ((start[i] == ' ') || (start[i] == '$'))
+			var_name = ft_substr(start, 1, i - 1);
+		if (!var_name)
+			continue ;
+		var_val = ft_getenv(var_name);
+		free(var_name);
+		strnrplc(str, var_val, str - start, i - 1);
+		start = ft_strchr(str, '$');
+		i = 0;
 	}
-	if (free == 1)
-		free (list_to_join);
-	if (free == -1)
-		free (list);
-	return (new_list);
 }
 
 char	*strnrplc(char *str, char *replace, int start, int len)

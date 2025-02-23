@@ -64,3 +64,18 @@ void	close_pipe(int *pipe, int len)
 	while (++i < len)
 		close(pipe[i]);
 }
+
+char	*strjoin_n_gnl(int fd)
+{
+	char	*line;
+	char	*temp;
+
+	line = ft_calloc(1, sizeof(char));
+	temp = get_next_line(fd);
+	while (temp != NULL)
+	{
+		line = ft_strjoin(line, temp);
+		temp = get_next_line(fd);
+	}
+	return (line);
+}
