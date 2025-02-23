@@ -1,30 +1,30 @@
 #include "minishell.h"
 
-t_node	function_matching(char *str, char **envp)
+t_node	*function_matching(char *str)
 {
 	char	**comm_n_flags;
 	char	*comm;
 
 	comm_n_flags = ft_split(str, ' ');
 	comm = comm_n_flags[0];
-	if (strncmp("cd", comm, ft_strlen(comm)))
+	if (ft_strncmp("cd", comm, ft_strlen(comm)))
 		return (create_cd_node(comm_n_flags));
-	else if (strncmp("echo", comm, ft_strlen(comm)))
+	else if (ft_strncmp("echo", comm, ft_strlen(comm)))
 		return (create_echo_node(comm_n_flags));
-	else if (strncmp("pwd", comm, ft_strlen(comm)))
+	else if (ft_strncmp("pwd", comm, ft_strlen(comm)))
 		return (create_pwd_node(comm_n_flags));
-	else if (strncmp("export", comm, ft_strlen(comm)))
+	else if (ft_strncmp("export", comm, ft_strlen(comm)))
 		return (create_export_node(comm_n_flags));
-	else if (strncmp("unset", comm, ft_strlen(comm)))
+	else if (ft_strncmp("unset", comm, ft_strlen(comm)))
 		return (create_unset_node(comm_n_flags));
-	else if (strncmp("env", comm, ft_strlen(comm)))
+	else if (ft_strncmp("env", comm, ft_strlen(comm)))
 		return (create_env_node(comm_n_flags));
-	else if (strncmp("exit", comm, ft_strlen(comm)))
+	else if (ft_strncmp("exit", comm, ft_strlen(comm)))
 		return (create_exit_node(comm_n_flags));
-	return (create_exec_node(comm_n_flags, envp));
+	return (create_exec_node(comm_n_flags));
 }
 
-char	*fnames_to_nodes(t_node cur_node, char *comm, char ch)
+char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch)
 {
 	char	*fname;
 	char	*start;
@@ -44,6 +44,7 @@ char	*fnames_to_nodes(t_node cur_node, char *comm, char ch)
 				cur_node->next = create_redir_node(ch + 1, fname);
 			else
 				cur_node->next = create_redir_node(ch, fname);
+			cur_node = cur_node->next;
 			comm = strnrplc(comm, NULL, comm - start, i - word_s);
 		}
 		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))
@@ -55,7 +56,6 @@ char	*fnames_to_nodes(t_node cur_node, char *comm, char ch)
 void	heredoc(char *str)
 {
 	char	*line;
-	char	*input;
 
 	line = readline(">");
 	while (ft_strncmp(line, str, ft_strlen(str)) != 0)
@@ -76,8 +76,8 @@ void	remove_link(t_list *head, t_list *cur, t_list *prev)
 	free(cur);
 }
 
-void	error_exit(int errno)
+void	error_exit(char *error_str)
 {
-	printf("Error: %s\n", strerror(errno));
+	printf("Error: %s\n", error_str);
 	exit(-1);
 }

@@ -14,7 +14,7 @@ int	run_redir(char **params, t_list *envp)
 		fd = open(params[1], O_APPEND, O_WRONLY);
 	free (params[1]);
 	if (fd == -1)
-		error_exit(errno);
+		error_exit(strerror(errno));
 	if (params[0][0] == '<')
 		dup2(fd, stdin);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
@@ -63,7 +63,7 @@ int	run_exec(char **params, t_list *envp)
 		temp = temp->next;
 	}
 	if (execve(com_flags[0], params, arr_envp) < 0)
-		error_exit(errno);
+		error_exit(strerror(errno));
 	return (0);
 }
 

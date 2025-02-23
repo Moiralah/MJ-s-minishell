@@ -1,19 +1,17 @@
 #include "minishell.h"
 
-void	executing(t_node start_node, int i)
+void	executing(t_node *start, char *line, int i)
 {
-	t_node	cur_node;
 	pid_t	pid;
 	int		*fd;
 	int		q;
 
-	cur_node = start_node;
 	fd = ft_calloc((i - 1) * 2, sizeof(int));
 	q = -1;
 	while (++q < (i - 1))
 		pipe(fd + (2 * q));
 	q = 0;
-	while ((cur_node != NULL) && (++q))
+	while ((start != NULL) && (++q))
 	{
 		pid = fork();
 		if (pid < 0)
@@ -30,53 +28,53 @@ void	executing(t_node start_node, int i)
 		if (pid == 0)
 		{
 			close_pipe(fd, (i - 1) * 2);
-			if (cur_node->run(cur_node->params) == 1)
+			if (start->run(start->params, start->envp) == 1)
 			{
 				free(line);
 				line = strjoin_n_gnl(STDOUT_FILENO);
 			}
 			kill(0, SIGKILL);
 		}
-		cur_node = cur_node->next;
+		start = start->next;
 	}
 	close_pipe(fd, (i - 1) * 2);
 	waitpid(-1, NULL, 0);
 	add_history(line);
+	free(line);
 }
 
-t_node	linking(t_node cur_node, char *comm)
+void	linking(t_node *cur_node, char *comm)
 {
 	char	*input;
 
-	comm = fnames_to_node(cur_node, comm, '<');
-	while (cur_node->next != NULL)
-		cur_node = cur_node->next;
+	comm = fnames_to_nodes(cur_node, comm, '<');
 	input = cur_node->params[1];
-	comm = fnames_to_list(cur_node, comm, '>');
-	while (cur_node->next != NULL)
-		cur_node = cur_node->next;
+	comm = fnames_to_nodes(cur_node, comm, '>');
 	if (ft_strncmp(input, cur_node->params[1], ft_strlen(input)) == 0)
-		error_exit(-1);
+		error_exit("grep: (standard input): input file is also the output");
 	cur_node->next = function_matching(comm);
-	return (cur_node->next);
+	cur_node = cur_node->next;
 }
 
-void	initialising(char **comms, char **envp)
+void	initialising(char **comms, char **envp, char *line)
 {
 	t_node	*nodes[2];
 	int		i;
 
 	i = -1;
-	while (comms[++i] != '\0')
+	nodes[0] = NULL;
+	nodes[1] = NULL;
+	while (comms[++i] != NULL)
 	{
-		expansion(comms[i]);
-		nodes[1] = linking(nodes[1], comms[i]);
+		comms[i] = expansion(comms[i]);
+		linking(nodes[1], comms[i]);
 		if (i == 0)
 			nodes[0] = nodes[1];
 	}
 	free(comms);
 	nodes[0]->envp = init_envp(envp);
-	executing(nodes[0], i);
+	nodes[1] = nodes[0];
+	executing(nodes[1], line, i);
 	while (nodes[0]->envp != NULL)
 		remove_link(nodes[0]->envp, nodes[0]->envp, NULL);
 	while (nodes[0] != NULL)
@@ -92,16 +90,16 @@ char	*listening(int i, int q)
 	char	*line;
 
 	line = readline("MJ > ");
-	while (line[i] != "\0")
+	while (line[i] != '\0')
 	{
 		q = 0;
 		if ((line[i] == '"') && ft_strchr(line + i + 1, '"'))
 			i = ft_strchr(line + i + 1, '"') - line;
 		else if ((line[i] == '"') && !ft_strchr(line + i + 1, '"'))
 			q = 1;
-		else if ((line[i] == ''') && ft_strchr(line + i + 1, '''))
+		else if ((line[i] == 39) && ft_strchr(line + i + 1, 39))
 			i = ft_strchr(line + i + 1, 39) - line;
-		else if ((line[i] == ''') && !ft_strchr(line + i + 1, '''))
+		else if ((line[i] == 39) && !ft_strchr(line + i + 1, 39))
 			q = 1;
 		if (q)
 		{
@@ -117,7 +115,7 @@ char	*listening(int i, int q)
 int	main(int argc, char **argv, char **envp)
 {
 	char	*input;
-	int	running;
+	int		running;
 
 	running = 1;
 	if ((argc > 1) && (argv != NULL))
@@ -125,8 +123,7 @@ int	main(int argc, char **argv, char **envp)
 	while (running)
 	{
 		input = listening(0, 0);
-		initialising(ft_split(input, '|'), envp);
-		free(input);
+		initialising(ft_split(input, '|'), envp, input);
 	}
 	return (0);
 }

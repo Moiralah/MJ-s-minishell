@@ -1,7 +1,10 @@
 #define MINISHELL_H
 #ifdef MINISHELL_H
+# include <errno.h>
 # include <unistd.h>
 # include <stdlib.h>
+# include <signal.h>
+# include <sys/wait.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "../libft/libft.h"
@@ -11,7 +14,7 @@
 typedef struct s_list
 {
 	char			*key;
-	char			*value;
+	char			*val;
 	struct s_list	*next;
 }	t_list;
 
@@ -27,23 +30,23 @@ typedef struct s_nodes
 
 //////////////////// Create Node ////////////////////////////////////////
 
-t_node	create_cd_node(char **path);
+t_node	*create_cd_node(char **path);
 
-t_node	create_echo_node(char **to_print);
+t_node	*create_echo_node(char **to_print);
 
-t_node	create_pwd_node(char **params_to_verify);
+t_node	*create_pwd_node(char **params_to_verify);
 
-t_node	create_export_node(char **to_set);
+t_node	*create_export_node(char **to_set);
 
-t_node	create_unset_node(char **to_unset);
+t_node	*create_unset_node(char **to_unset);
 
-t_node	create_exec_node(char **comm_n_flags);
+t_node	*create_exec_node(char **comm_n_flags);
 
-t_node	create_exit_node(char **code);
+t_node	*create_exit_node(char **code);
 
-t_node	create_env_node(char **var);
+t_node	*create_env_node(char **var);
 
-t_node	create_redir_node(char *ch, char *filename);
+t_node	*create_redir_node(char ch, char *filename);
 
 //////////////////// Run Node //////////////////////////////////////////
 
@@ -51,7 +54,7 @@ int	run_cd(char **params, t_list *envp);
 
 int	run_echo(char **params, t_list *envp);
 
-int	run_pwd(char **params, t_list envp);
+int	run_pwd(char **params, t_list *envp);
 
 int	run_export(char **params, t_list *envp);
 
@@ -67,7 +70,7 @@ int	run_exit(char **params, t_list *envp);
 
 //////////////////// ENV Utils //////////////////////////////////////////
 
-t_list	*init_env(char **envp);
+t_list	*init_envp(char **envp);
 
 char	*ft_getenv(t_list *envp, char *key);
 
@@ -77,15 +80,15 @@ void	close_pipe(int *pipe, int len);
 
 ////////////////////  Generic Utils ////////////////////////////////////////
 
-t_node	function_matching(char *str, char **envp);
+t_node	*function_matching(char *str);
 
-char	*fnames_to_nodes(t_node cur_node, char *comm, char ch);
+char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch);
 
 void	heredoc(char *str);
 
 void	remove_link(t_list *head, t_list *cur, t_list *prev);
 
-void	error_exit(int errno);
+void	error_exit(char *str_error);
 
 ////////////////////  Signal Utils ////////////////////////////////////////
 

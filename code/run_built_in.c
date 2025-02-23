@@ -42,7 +42,7 @@ int	run_echo(char **params, t_list *envp)
 	return (0);
 }
 
-int	run_pwd(char **params, t_list envp)
+int	run_pwd(char **params, t_list *envp)
 {
 	char	*cwd;
 
