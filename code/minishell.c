@@ -56,10 +56,9 @@ t_node	linking(t_node cur_node, char *comm)
 	return (cur_node->next);
 }
 
-void	initialising(chra **comms, char **envp)
+void	initialising(char **comms, char **envp)
 {
 	t_node	*nodes[2];
-	char	**comms;
 	int		i;
 
 	i = -1;

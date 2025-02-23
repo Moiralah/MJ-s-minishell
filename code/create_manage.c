@@ -48,7 +48,7 @@ t_node	create_env_node(char **var)
 t_node	create_redir_node(char *ch, char *filename)
 {
 	t_node	new_node;
-	char	*params[4];
+	char	*params[3];
 
 	params[0] = ch;
 	params[1] = filename;
