@@ -19,7 +19,7 @@ t_list	*init_envp(char **envp)
 	return (start);
 }
 
-char	*ft_getenv(t_list *envp, char *key)
+char	*ft_getenv(char *key, t_list *envp)
 {
 	t_list	*temp;
 

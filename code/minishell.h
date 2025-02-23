@@ -72,7 +72,7 @@ int	run_exit(char **params, t_list *envp);
 
 t_list	*init_envp(char **envp);
 
-char	*ft_getenv(t_list *envp, char *key);
+char	*ft_getenv(char *key, t_list *envp);
 
 void	ft_setenv(t_list *envp, char *key, char *val, int overwrite);
 
@@ -102,7 +102,7 @@ void	restore_signal(void);
 
 ////////////////////  Str Utils ////////////////////////////////////////
 
-char	*expansion(char *str);
+char	*expansion(char *str, t_list *envp);
 
 char	*strjoin_n_gnl(int fd);
 

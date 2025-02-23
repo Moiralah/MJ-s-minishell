@@ -66,7 +66,7 @@ void	initialising(char **comms, char **envp, char *line)
 	nodes[1] = NULL;
 	while (comms[++i] != NULL)
 	{
-		comms[i] = expansion(comms[i]);
+//		comms[i] = expansion(comms[i]);
 		linking(nodes[1], comms[i]);
 		if (i == 0)
 			nodes[0] = nodes[1];

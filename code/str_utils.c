@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-char	*expansion(char *str)
+char	*expansion(char *str, t_list *envp)
 {
 	char	*start;
 	char	*var_name;
@@ -18,12 +18,13 @@ char	*expansion(char *str)
 			var_name = ft_substr(start, 1, i - 1);
 		if (!var_name)
 			continue ;
-		var_val = ft_getenv(var_name);
+		var_val = ft_getenv(var_name, envp);
 		free(var_name);
 		strnrplc(str, var_val, str - start, i - 1);
 		start = ft_strchr(str, '$');
 		i = 0;
 	}
+	return (str);
 }
 
 char	*strnrplc(char *str, char *replace, int start, int len)
@@ -57,7 +58,7 @@ int	word_end(char *word, char *end_set, int print)
 	q = 0;
 	if (word[++i] == '"')
 		return (ft_strchr(word, '"') - word);
-	while (word[i] != "\0")
+	while (word[i] != '\0')
 	{
 		if (print && (!ft_isprint(word[i])))
 			return (i);
@@ -75,7 +76,7 @@ void	free_strlist(char **strlist, int index)
 	int	i;
 
 	i = -1;
-	while (strlist[++i] != "\0")
+	while (strlist[++i] != NULL)
 	{
 		if (i == index)
 			break ;

@@ -3,6 +3,7 @@
 int	run_redir(char **params, t_list *envp)
 {
 	int	fd;
+	(void) envp;
 
 	if (params[0][0] == '<')
 		fd = open(params[1], O_CREAT, O_RDONLY);
@@ -12,32 +13,29 @@ int	run_redir(char **params, t_list *envp)
 		fd = open(params[1], O_CREAT, O_WRONLY);
 	else if (params[0][0] == '?')
 		fd = open(params[1], O_APPEND, O_WRONLY);
-	free (params[1]);
 	if (fd == -1)
 		error_exit(strerror(errno));
 	if (params[0][0] == '<')
-		dup2(fd, stdin);
+		dup2(fd, STDIN_FILENO);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
-		dup2(fd, stdout);
+		dup2(fd, STDOUT_FILENO);
 	else
-		dup2(stdin, stdin);
+		dup2(STDIN_FILENO, STDIN_FILENO);
 	if (params[0][0] != '=')
-		return (close(fd), 0);
-	return (1);
+		return (free2d(params), close(fd), 0);
+	return (free2d(params), 1);
 }
 
 int	run_env(char **params, t_list *envp)
 {
 	t_list	*temp;
 
-	run_export(params + 1, envp);
 	temp = envp;
 	while (temp != NULL)
 	{
 		printf("%s=%s\n", temp->key, temp->val);
 		temp = temp->next;
 	}
-	run_unset(params + 1, envp);
 	free2d(params);
 	return (0);
 }
@@ -62,27 +60,50 @@ int	run_exec(char **params, t_list *envp)
 		arr_envp[strlist_len(arr_envp)] = ft_strjoin(line, temp->val);
 		temp = temp->next;
 	}
-	if (execve(com_flags[0], params, arr_envp) < 0)
+	if (execve(params[0], params, arr_envp) < 0)
 		error_exit(strerror(errno));
 	return (0);
 }
 
+int	legitnum(char *argv)
+{
+	if (!argv || !*argv)
+		return (0);
+	if (argv[0] == '-' || argv[0] == '+')
+		argv++;
+	if (!*argv)
+		return (0);
+	while (*argv)
+	{
+		if (!ft_isdigit(*argv))
+			return (0);
+		argv++;
+	}
+	return (1);
+}
+
 int	run_exit(char **params, t_list *envp)
 {
-	int	isnum;
+	long long	exit_status;
+	(void)		envp;
 
-	isnum = 0;
 	if (strlist_len(params) == 1)
 		exit(0);
-	if ((params[1][0] == '-') || (params[1][0] == '+'))
-		params[1]++;
-	else if ((strlist_len(params) == 2) && ft_isdigit(params[1]))
-		exit(ft_atoi(params[1]));
-	else if ((strlist_len(params) >= 2) && ft_isdigit(params[1]))
-		return (printf("bash: exit: too many arguments\n"), 0);
+	if (strlist_len(params) >= 2 && legitnum(params[1]))
+	{
+		exit_status = ft_atoll(params[1]);
+		if (strlist_len(params) > 2)
+		{
+			ft_putstr_fd("exit: too many arguments\n", 2);
+			return (0);
+		}
+		exit((unsigned char)exit_status);
+	}
 	else
 	{
-		printf("bash: exit: %s: numeric argument required", params[1]);
+		ft_putstr_fd("exit: ", 2);
+		ft_putstr_fd(params[1], 2);
+		ft_putstr_fd(": numeric argument required\n", 2);
 		exit(2);
 	}
 	return (0);

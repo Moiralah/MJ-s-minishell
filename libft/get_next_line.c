@@ -12,16 +12,6 @@
 
 #include "libft.h"
 
-char	*ft_strchr(const char *s, int c)
-{
-	while (*s)
-		if (*s++ == (char)c)
-			return ((char *)--s);
-	if (*s == (char)c)
-		return ((char *)s);
-	return (NULL);
-}
-
 char	*buffer_add(char *buffer_all, char *buffer)
 {
 	char	*temp;

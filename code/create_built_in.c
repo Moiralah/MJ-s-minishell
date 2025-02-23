@@ -5,7 +5,7 @@ t_node	*	create_cd_node(char **path)
 	t_node	*new_node;
 
 	if (strlist_len(path) > 2)
-		error_exit(1);
+		error_exit(strerror(errno));
 	new_node = ft_calloc(1, sizeof(t_node));
 	new_node->envp = NULL;
 	new_node->params = path;
