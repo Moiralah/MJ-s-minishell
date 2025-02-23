@@ -1,10 +1,5 @@
 #include "minishell.h"
 
-int	run_pipe(char **params, t_list *envp)
-{
-	return (0);
-}
-
 int	run_redir(char **params, t_list *envp)
 {
 	int	fd;
