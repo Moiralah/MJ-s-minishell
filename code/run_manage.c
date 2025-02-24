@@ -50,19 +50,19 @@ int	run_exec(char **params, t_list *envp)
 	len = 0;
 	temp = envp;
 	while (temp != NULL)
+	{
 		len++;
-	printf("Hi\n");
+		temp = temp->next;
+	}
 	arr_envp = ft_calloc(len + 1, sizeof(char *));
 	arr_envp[len] = NULL;
 	temp = envp;
-	printf("Hi\n");
 	while (strlist_len(arr_envp) < len)
 	{
-		line = ft_strjoin(temp->key, "=");
-		arr_envp[strlist_len(arr_envp)] = ft_strjoin(line, temp->val);
+		line = ft_strjoin(ft_strdup(temp->key), ft_strdup("="));
+		arr_envp[strlist_len(arr_envp)] = ft_strjoin(line, ft_strdup(temp->val));
 		temp = temp->next;
 	}
-	printf("Hi\n");
 	if (execve(params[0], params, arr_envp) < 0)
 		error_exit(strerror(errno));
 	return (0);
