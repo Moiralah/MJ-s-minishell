@@ -1,5 +1,41 @@
 #include "minishell.h"
 
+// ECHOCTL
+//               (not in POSIX) If ECHO is also set, terminal special
+//               characters other than TAB, NL, START, and STOP are echoed
+//               as ^X, where X is the character with ASCII code 0x40
+//               greater than the special character.  For example, character
+//               0x08 (BS) is echoed as ^H.  [requires _BSD_SOURCE or
+//               _SVID_SOURCE]
+
+// Retrieving and changing terminal settings
+//        tcgetattr() gets the parameters associated with the object
+//        referred by fd and stores them in the termios structure referenced
+//        by termios_p.  This function may be invoked from a background
+//        process; however, the terminal attributes may be subsequently
+//        changed by a foreground process.
+
+//        tcsetattr() sets the parameters associated with the terminal
+//        (unless support is required from the underlying hardware that is
+//        not available) from the termios structure referred to by
+//        termios_p.  optional_actions specifies when the changes take
+//        effect:
+
+//        TCSANOW
+//               the change occurs immediately.
+//		  c_lflag
+//			is a field in the struct termios that contains
+//			various flags controlling the behavior of the terminal.
+
+void	disable_echoctl(void)
+{
+	struct termios	term;
+
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag &= ~(ECHOCTL);
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
+
 void	sigint_handler(int signo)
 {
 	(void)signo;
@@ -25,6 +61,7 @@ void	init_signal(void)
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa, NULL);
 	signal(SIGQUIT, SIG_IGN);
+	disable_echoctl();
 }
 
 void	restore_signal(void)
