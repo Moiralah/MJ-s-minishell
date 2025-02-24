@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-t_node	*	create_cd_node(char **path)
+t_node	*create_cd_node(char **path)
 {
 	t_node	*new_node;
 
@@ -13,7 +13,7 @@ t_node	*	create_cd_node(char **path)
 	return (new_node);
 }
 
-t_node	*	create_echo_node(char **to_print)
+t_node	*create_echo_node(char **to_print)
 {
 	t_node	*new_node;
 
@@ -24,7 +24,7 @@ t_node	*	create_echo_node(char **to_print)
 	return (new_node);
 }
 
-t_node	*	create_pwd_node(char **params_to_verify)
+t_node	*create_pwd_node(char **params_to_verify)
 {
 	t_node	*new_node;
 
@@ -35,7 +35,7 @@ t_node	*	create_pwd_node(char **params_to_verify)
 	return (new_node);
 }
 
-t_node	*	create_export_node(char **to_set)
+t_node	*create_export_node(char **to_set)
 {
 	t_node	*new_node;
 
@@ -46,7 +46,7 @@ t_node	*	create_export_node(char **to_set)
 	return (new_node);
 }
 
-t_node	*	create_unset_node(char **to_unset)
+t_node	*create_unset_node(char **to_unset)
 {
 	t_node	*new_node;
 
