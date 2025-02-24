@@ -7,19 +7,19 @@ t_node	*function_matching(char *str)
 
 	comm_n_flags = ft_split(str, ' ');
 	comm = comm_n_flags[0];
-	if (ft_strncmp("cd", comm, ft_strlen(comm)))
+	if (!ft_strncmp("cd", comm, ft_strlen(comm)))
 		return (create_cd_node(comm_n_flags));
-	else if (ft_strncmp("echo", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("echo", comm, ft_strlen(comm)))
 		return (create_echo_node(comm_n_flags));
-	else if (ft_strncmp("pwd", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("pwd", comm, ft_strlen(comm)))
 		return (create_pwd_node(comm_n_flags));
-	else if (ft_strncmp("export", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("export", comm, ft_strlen(comm)))
 		return (create_export_node(comm_n_flags));
-	else if (ft_strncmp("unset", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("unset", comm, ft_strlen(comm)))
 		return (create_unset_node(comm_n_flags));
-	else if (ft_strncmp("env", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("env", comm, ft_strlen(comm)))
 		return (create_env_node(comm_n_flags));
-	else if (ft_strncmp("exit", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("exit", comm, ft_strlen(comm)))
 		return (create_exit_node(comm_n_flags));
 	return (create_exec_node(comm_n_flags));
 }

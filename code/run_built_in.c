@@ -49,6 +49,7 @@ int	run_pwd(char **params, t_list *envp)
 	char	*cwd;
 	(void) envp;
 
+	printf();
 	free2d(params);
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
