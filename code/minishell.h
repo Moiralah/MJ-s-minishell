@@ -74,7 +74,7 @@ t_list	*init_envp(char **envp);
 
 char	*ft_getenv(char *key, t_list *envp);
 
-void	ft_setenv(t_list *envp, char *key, char *val, int overwrite);
+void	ft_setenv(t_list **envp, char *key, char *val, int overwrite);
 
 void	close_pipe(int *pipe, int len);
 

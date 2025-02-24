@@ -12,13 +12,13 @@ int	run_cd(char **params, t_list *envp)
 		new_path = ft_strdup(ft_getenv("OLDPWD", envp));
 	else
 		new_path = params[1];
-	ft_setenv(envp, "OLDPWD", getcwd(NULL, 0), 1);
+	ft_setenv(&envp, "OLDPWD", getcwd(NULL, 0), 1);
 	if (chdir(new_path) == -1)
 	{
 		printf("bash: cd: %s: No such file or directory\n", new_path);
 		error_exit(NULL);
 	}
-	ft_setenv(envp, "PWD", getcwd(NULL, 0), 1);
+	ft_setenv(&envp, "PWD", getcwd(NULL, 0), 1);
 	if (params[1] && (params[1][0] == '-'))
 		free(new_path);
 	return (free2d(params), 0);
@@ -75,7 +75,7 @@ int	run_export(char **params, t_list *envp)
 			error_exit(NULL);
 		key = ft_substr(params[i], 0, q);
 		val = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);
-		ft_setenv(envp, key, val, 1);
+		ft_setenv(&envp, key, val, 1);
 	}
 	free2d(params);
 	return (0);

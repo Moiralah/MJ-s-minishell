@@ -47,16 +47,22 @@ void	linking(t_node *cur_node, char *comm)
 {
 	char	*input;
 
+	input = NULL;
 	comm = fnames_to_nodes(cur_node, comm, '<');
-	input = cur_node->params[1];
+	if (cur_node)
+		input = cur_node->params[1];
 	comm = fnames_to_nodes(cur_node, comm, '>');
-	if (ft_strncmp(input, cur_node->params[1], ft_strlen(input)) == 0)
+	if (input && !ft_strncmp(input, cur_node->params[1], ft_strlen(input)))
 		error_exit("grep: (standard input): input file is also the output");
-	cur_node->next = function_matching(comm);
-	cur_node = cur_node->next;
+	if (!cur_node)
+		cur_node = function_matching(comm);
+	else
+		cur_node->next = function_matching(comm);
+	if (cur_node->next)
+		cur_node = cur_node->next;
 }
 
-void	initialising(char **comms, char **envp, char *line)
+void	initialising(t_list *envp, char **comms, char *line)
 {
 	t_node	*nodes[2];
 	int		i;
@@ -66,14 +72,14 @@ void	initialising(char **comms, char **envp, char *line)
 	nodes[1] = NULL;
 	while (comms[++i] != NULL)
 	{
-//		comms[i] = expansion(comms[i]);
+		comms[i] = expansion(comms[i], envp);
 		linking(nodes[1], comms[i]);
 		if (i == 0)
 			nodes[0] = nodes[1];
 	}
-	free(comms);
-	nodes[0]->envp = init_envp(envp);
+	nodes[0]->envp = envp;
 	nodes[1] = nodes[0];
+	printf("Done\n");
 	executing(nodes[1], line, i);
 	while (nodes[0]->envp != NULL)
 		remove_link(nodes[0]->envp, nodes[0]->envp, NULL);
@@ -117,13 +123,13 @@ int	main(int argc, char **argv, char **envp)
 	char	*input;
 	int		running;
 
-	running = 1;
+	running = -1;
 	if ((argc > 1) && (argv != NULL))
 		return (printf("Don't give any args"), -1);
 	while (running)
 	{
 		input = listening(0, 0);
-		initialising(ft_split(input, '|'), envp, input);
+		initialising(init_envp(envp), ft_split(input, '|'), input);
 	}
 	return (0);
 }

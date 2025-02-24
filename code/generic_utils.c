@@ -34,7 +34,7 @@ char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch)
 	i = 0;
 	word_s = 0;
 	start = ft_strchr(comm, ch);
-	while (start[++i] != '\0')
+	while ((start) && (start[++i] != '\0'))
 	{
 		if (word_s)
 		{
@@ -50,6 +50,7 @@ char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch)
 		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))
 			word_s = i;
 	}
+	printf("Done\n");
 	return (comm);
 }
 

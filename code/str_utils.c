@@ -9,7 +9,7 @@ char	*expansion(char *str, t_list *envp)
 
 	i = 0;
 	start = ft_strchr(str, '$');
-	while (start[++i] != '\0')
+	while ((start) && (start[++i] != '\0'))
 	{
 		var_name = NULL;
 		if (start[i] == '?')

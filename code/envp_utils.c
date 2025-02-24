@@ -14,7 +14,7 @@ t_list	*init_envp(char **envp)
 		q = ft_strchr(envp[i], '=') - envp[i];
 		str[0] = ft_substr(envp[i], 0, q);
 		str[1] = ft_substr(envp[i], q + 1, ft_strlen(envp[i]) - q - 1);
-		ft_setenv(start, str[0], str[1], 0);
+		ft_setenv(&start, str[0], str[1], 0);
 	}
 	return (start);
 }
@@ -33,28 +33,33 @@ char	*ft_getenv(char *key, t_list *envp)
 	return (NULL);
 }
 
-void	ft_setenv(t_list *envp, char *key, char *val, int overwrite)
+void	ft_setenv(t_list **envp, char *key, char *val, int overwrite)
 {
-	t_list	*temp;
-	t_list	*new;
+	t_list	*node[2];
 
-	temp = envp;
-	while (temp)
+	node[0] = *envp;
+	while (node[0])
 	{
-		if (ft_strncmp(temp->key, key, ft_strlen(key)) == 0)
+		if (ft_strncmp(node[0]->key, key, ft_strlen(key)) == 0)
 		{
 			if (overwrite)
-				free(temp->val);
-			temp->val = val;
+				free(node[0]->val);
+			node[0]->val = val;
 			return ;
 		}
-		temp = temp->next;
+		node[0] = node[0]->next;
 	}
-	new = malloc(sizeof(t_list));
-	new->key = ft_strdup(key);
-	new->val = ft_strdup(val);
-	new->next = NULL;
-	temp->next = new;
+	node[1] = malloc(sizeof(t_list));
+	node[1]->key = key;
+	node[1]->val = val;
+	node[1]->next = NULL;
+	node[0] = *envp;
+	while ((node[0]) && (node[0]->next))
+		node[0] = node[0]->next;
+	if (!node[0])
+		*envp = node[1];
+	else
+		node[0]->next = node[1];
 }
 
 void	close_pipe(int *pipe, int len)
