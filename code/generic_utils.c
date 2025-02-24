@@ -50,7 +50,6 @@ char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
 		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))
 			word_s = i;
 	}
-	printf("Done\n");
 	return (comm);
 }
 

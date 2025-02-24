@@ -33,7 +33,7 @@ void	executing(t_node *start, char *line, int i)
 				free(line);
 				line = strjoin_n_gnl(STDOUT_FILENO);
 			}
-			kill(0, SIGKILL);
+			kill(pid, SIGKILL);
 		}
 		start = start->next;
 	}
