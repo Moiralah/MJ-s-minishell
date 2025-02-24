@@ -108,7 +108,7 @@ char	*listening(int i, int q)
 			q = 1;
 		if (q)
 		{
-			line = ft_strjoin(line, "\n");
+			line = ft_strjoin(line, ft_strdup("\n"));
 			line = ft_strjoin(line, readline("> "));
 		}
 		else
