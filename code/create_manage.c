@@ -1,5 +1,16 @@
 #include "minishell.h"
 
+t_node	*create_generic_node(void)
+{
+	t_node	*new_node;
+
+	new_node = ft_calloc(1, sizeof(t_node));
+	new_node->envp = NULL;
+	new_node->params = NULL;
+	new_node->run = NULL;
+	return (new_node);
+}
+
 t_node	*create_exec_node(char **comm_n_flags)
 {
 	t_node	*new_node;

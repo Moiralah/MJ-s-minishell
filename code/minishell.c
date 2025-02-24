@@ -43,23 +43,19 @@ void	executing(t_node *start, char *line, int i)
 	free(line);
 }
 
-void	linking(t_node *cur_node, char *comm)
+t_node	*linking(t_node *cur_node, char *comm)
 {
 	char	*input;
 
 	input = NULL;
-	comm = fnames_to_nodes(cur_node, comm, '<');
-	if (cur_node)
+	comm = fnames_to_nodes(&cur_node, comm, '<');
+	if ((cur_node) && (cur_node->params))
 		input = cur_node->params[1];
-	comm = fnames_to_nodes(cur_node, comm, '>');
+	comm = fnames_to_nodes(&cur_node, comm, '>');
 	if (input && !ft_strncmp(input, cur_node->params[1], ft_strlen(input)))
 		error_exit("grep: (standard input): input file is also the output");
-	if (!cur_node)
-		cur_node = function_matching(comm);
-	else
-		cur_node->next = function_matching(comm);
-	if (cur_node->next)
-		cur_node = cur_node->next;
+	cur_node->next = function_matching(comm);
+	return (cur_node->next);
 }
 
 void	initialising(t_list *envp, char **comms, char *line)
@@ -68,14 +64,12 @@ void	initialising(t_list *envp, char **comms, char *line)
 	int		i;
 
 	i = -1;
-	nodes[0] = NULL;
-	nodes[1] = NULL;
+	nodes[0] = create_generic_node();
+	nodes[1] = nodes[0];
 	while (comms[++i] != NULL)
 	{
 		comms[i] = expansion(comms[i], envp);
-		linking(nodes[1], comms[i]);
-		if (i == 0)
-			nodes[0] = nodes[1];
+		nodes[1] = linking(nodes[1], comms[i]);
 	}
 	nodes[0]->envp = envp;
 	nodes[1] = nodes[0];

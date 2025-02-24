@@ -24,7 +24,7 @@ t_node	*function_matching(char *str)
 	return (create_exec_node(comm_n_flags));
 }
 
-char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch)
+char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
 {
 	char	*fname;
 	char	*start;
@@ -41,10 +41,10 @@ char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch)
 			i = word_end(start + word_s, " <>", 1);
 			fname = ft_substr(start, word_s, i - word_s);
 			if (start[0] == start[1])
-				cur_node->next = create_redir_node(ch + 1, fname);
+				cur_node[0]->next = create_redir_node(ch + 1, fname);
 			else
-				cur_node->next = create_redir_node(ch, fname);
-			cur_node = cur_node->next;
+				cur_node[0]->next = create_redir_node(ch, fname);
+			cur_node[0] = cur_node[0]->next;
 			comm = strnrplc(comm, NULL, comm - start, i - word_s);
 		}
 		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))

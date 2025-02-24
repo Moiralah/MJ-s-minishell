@@ -30,6 +30,8 @@ typedef struct s_nodes
 
 //////////////////// Create Node ////////////////////////////////////////
 
+t_node	*create_generic_node(void);
+
 t_node	*create_cd_node(char **path);
 
 t_node	*create_echo_node(char **to_print);
@@ -82,7 +84,7 @@ void	close_pipe(int *pipe, int len);
 
 t_node	*function_matching(char *str);
 
-char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch);
+char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch);
 
 void	heredoc(char *str);
 
