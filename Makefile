@@ -12,7 +12,7 @@
 
 NAME	= minishell
 
-FLAGS	= -Wall -Wextra -Werror#-fsanitize=address -g3 -ggdb
+FLAGS	= -Wall -Wextra -Werror -fsanitize=address -g3 -ggdb
 
 CC	= gcc
 
