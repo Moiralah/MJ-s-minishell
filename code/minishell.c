@@ -2,6 +2,7 @@
 
 void	executing(t_node *start, char *line, int i)
 {
+	t_node	*cur;
 	pid_t	pid;
 	int		*fd;
 	int		q;
@@ -11,7 +12,8 @@ void	executing(t_node *start, char *line, int i)
 	while (++q < (i - 1))
 		pipe(fd + (2 * q));
 	q = 0;
-	while ((start != NULL) && (++q))
+	cur = start->next;
+	while ((cur != NULL) && (++q))
 	{
 		pid = fork();
 		if (pid < 0)
@@ -28,14 +30,18 @@ void	executing(t_node *start, char *line, int i)
 		if (pid == 0)
 		{
 			close_pipe(fd, (i - 1) * 2);
-			if (start->run(start->params, start->envp) == 1)
+			if (cur->run(cur->params, start->envp) == 1)
 			{
 				free(line);
 				line = strjoin_n_gnl(STDOUT_FILENO);
 			}
-			kill(pid, SIGKILL);
+			char	*comm[3];
+			comm[0] = "echo";
+			comm[1] = "-n";
+			comm[2] = NULL;
+			run_exec(comm, start->envp);
 		}
-		start = start->next;
+		cur = cur->next;
 	}
 	close_pipe(fd, (i - 1) * 2);
 	waitpid(-1, NULL, 0);
