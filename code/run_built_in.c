@@ -53,8 +53,8 @@ int	run_pwd(char **params, t_list *envp)
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
 		error_exit(strerror(errno));
-	write(1, cwd, ft_strlen(cwd));
-	//printf("%s\n", cwd);
+	//write(1, cwd, ft_strlen(cwd));
+	printf("%s\n", cwd);
 	free(cwd);
 	return (0);
 }

@@ -3,8 +3,8 @@
 int	run_redir(char **params, t_list *envp)
 {
 	int	fd;
-	(void) envp;
 
+	(void) envp;
 	if (params[0][0] == '<')
 		fd = open(params[1], O_CREAT, O_RDONLY);
 	else if (params[0][0] == '=')
@@ -43,7 +43,7 @@ int	run_env(char **params, t_list *envp)
 int	run_exec(char **params, t_list *envp)
 {
 	t_list	*temp;
-	char	**arr_envp;
+	char	**arr_e;
 	char	*line;
 	int		len;
 
@@ -54,16 +54,16 @@ int	run_exec(char **params, t_list *envp)
 		len++;
 		temp = temp->next;
 	}
-	arr_envp = ft_calloc(len + 1, sizeof(char *));
-	arr_envp[len] = NULL;
-	temp = envp;
-	while (strlist_len(arr_envp) < len)
+	arr_e = ft_calloc(len + 1, sizeof(char *));
+	arr_e[len] = NULL;
+	while (strlist_len(arr_e) < len)
 	{
-		line = ft_strjoin(ft_strdup(temp->key), ft_strdup("="));
-		arr_envp[strlist_len(arr_envp)] = ft_strjoin(line, ft_strdup(temp->val));
-		temp = temp->next;
+		line = ft_strjoin(ft_strdup(envp->key), ft_strdup("="));
+		arr_e[strlist_len(arr_e)] = ft_strjoin(line, ft_strdup(envp->val));
+		envp = envp->next;
 	}
-	if (execve(params[0], params, arr_envp) < 0)
+	line = ft_strjoin(ft_strdup("/usr/bin/"), ft_strdup(params[0]));
+	if (execve(line, params, arr_e) < 0)
 		error_exit(strerror(errno));
 	return (0);
 }
@@ -88,8 +88,8 @@ int	legitnum(char *argv)
 int	run_exit(char **params, t_list *envp)
 {
 	long long	exit_status;
-	(void)		envp;
 
+	(void) envp;
 	if (strlist_len(params) == 1)
 		exit(0);
 	if (strlist_len(params) >= 2 && legitnum(params[1]))
