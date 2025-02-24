@@ -17,11 +17,15 @@ void	free2d(char **str)
 	int	i;
 
 	i = 0;
+	if (str == NULL)
+		printf("NULL\n");
 	while (str[i])
 	{
+		printf("%d\n", i);
 		free(str[i]);
 		i++;
 	}
+	printf("Hi\n");
 	free(str);
 	str = NULL;
 }

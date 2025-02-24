@@ -73,7 +73,6 @@ void	initialising(t_list *envp, char **comms, char *line)
 	}
 	nodes[0]->envp = envp;
 	nodes[1] = nodes[0];
-	printf("Done\n");
 	executing(nodes[1], line, i);
 	while (nodes[0]->envp != NULL)
 		remove_link(nodes[0]->envp, nodes[0]->envp, NULL);

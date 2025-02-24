@@ -28,10 +28,9 @@ t_node	*	create_pwd_node(char **params_to_verify)
 {
 	t_node	*new_node;
 
-	free_strlist(params_to_verify, -1);
 	new_node = ft_calloc(1, sizeof(t_node	*));
 	new_node->envp = NULL;
-	new_node->params = NULL;
+	new_node->params = params_to_verify;
 	new_node->run = run_pwd;
 	return (new_node);
 }
