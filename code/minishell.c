@@ -122,6 +122,7 @@ int	main(int argc, char **argv, char **envp)
 		return (printf("Don't give any args"), -1);
 	while (running)
 	{
+		init_signal();
 		input = listening(0, 0);
 		initialising(init_envp(envp), ft_split(input, '|'), input);
 	}
