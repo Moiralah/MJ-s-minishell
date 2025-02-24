@@ -1,5 +1,14 @@
 #include "minishell.h"
 
+void	disable_echoctl(void)
+{
+	struct termios	term;
+
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag &= ~(ECHOCTL);
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
+
 void	sigint_handler(int signo)
 {
 	(void)signo;
@@ -25,6 +34,7 @@ void	init_signal(void)
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa, NULL);
 	signal(SIGQUIT, SIG_IGN);
+	disable_echoctl();
 }
 
 void	restore_signal(void)
