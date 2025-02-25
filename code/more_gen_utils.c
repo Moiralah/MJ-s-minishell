@@ -39,15 +39,14 @@ char	*expansion(char *str, t_list *envp)
 	return (str);
 }
 
-char	*run_node(t_node *start, t_node cur, char **input)
+void	run_node(t_node *start, t_node *cur, char **input)
 {
 	char	**comm;
 
-	comm = ft_calloc(3, sizof(char *));
+	comm = ft_calloc(3, sizeof(char *));
 	comm[0] = ft_strdup("echo");
 	comm[1] = ft_strdup("-n");
 	comm[2] = NULL;
-	pipe_handling(&fd, (i - 1) * 2);
 	if (cur->run(cur->params, start, cur) == 1)
 	{
 		free(input[0]);
@@ -82,17 +81,18 @@ char	*find_path(char *params, t_list *envp)
 	return (right_path);
 }
 
-void	change_io(pid_t pid, int *fd, int com_amnt, int q)
+void	change_io(int *fd, int com_amnt, int q)
 {
-	if ((pid == 0) && (com_amnt != 1) && (q == 1))
+	if ((com_amnt != 1) && (q == 1))
 		dup2(fd[1], STDOUT_FILENO);
-	else if ((pid == 0) && (com_amnt != 1) && (q == i))
+	else if ((com_amnt != 1) && (q == com_amnt))
 		dup2(fd[(q * 2) - 4], STDIN_FILENO);
-	else if ((pid == 0) && (com_amnt != 1))
+	else if (com_amnt != 1)
 	{
 		dup2(fd[(2 * q) - 4], STDIN_FILENO);
 		dup2(fd[(2 * q) - 1], STDOUT_FILENO);
 	}
+	pipe_handling(&fd, (com_amnt - 1) * 2);
 }
 
 void	heredoc(char *str)

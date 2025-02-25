@@ -28,8 +28,8 @@ void	executing(t_node *start, char *input, int i, int q)
 			error_exit(strerror(errno), start, cur);
 		if (!pid)
 		{
-			change_io(pid, fd, i, q);
-			input = run_node(pid, start, cur, input);
+			change_io(fd, i, q);
+			run_node(start, cur, &input);
 		}
 		cur = cur->next;
 	}
