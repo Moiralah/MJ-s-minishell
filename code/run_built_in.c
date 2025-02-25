@@ -26,6 +26,8 @@ int	run_cd(char **params, t_node *start_node, t_node *self)
 		new_path = ft_strdup(ft_getenv("OLDPWD", start_node->envp));
 	else
 		new_path = params[1];
+	if (*new_path == '\0')
+		return (-1);
 	ft_setenv(&(start_node->envp), "OLDPWD", getcwd(NULL, 0), 1);
 	if (chdir(new_path) == -1)
 	{

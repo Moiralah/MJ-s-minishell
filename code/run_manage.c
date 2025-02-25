@@ -42,6 +42,8 @@ int	run_env(char **params, t_node *start_node, t_node *self)
 	t_list	*temp;
 
 	(void) self;
+	if (strlist_len(params) != 1)
+		error_exit("Env with too many args\n", start_node, self);
 	temp = start_node->envp;
 	while (temp != NULL)
 	{

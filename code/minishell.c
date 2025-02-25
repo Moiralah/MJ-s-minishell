@@ -12,31 +12,24 @@
 
 #include "minishell.h"
 
-void	executing(t_node *start, char *input, int i, int q)
+void	executing(t_node *start, char *input, int com_amnt, int q)
 {
-	t_node	*cur;
-	pid_t	pid;
+	t_node	*nodes[2];
 	int		*fd;
 
 	fd = NULL;
-	pipe_handling(&fd, i);
-	cur = start->next;
-	while ((cur != NULL) && (++q))
+	nodes[0] = start->next;
+	nodes[1] = start;
+	pipe_handling(&fd, com_amnt);
+	while ((nodes[0] != NULL) && (++q))
 	{
-		pid = fork();
-		if (pid < 0)
-			error_exit(strerror(errno), start, cur);
-		if (!pid)
-		{
-			change_io(fd, i, q);
-			run_node(start, cur, &input);
-		}
-		cur = cur->next;
+		change_io(fd, com_amnt, q);
+		run_node(nodes, &input, fd, com_amnt);
+		nodes[0] = nodes[0]->next;
 	}
-	pipe_handling(&fd, (i - 1) * 2);
+	pipe_handling(&fd, com_amnt);
 	waitpid(-1, NULL, 0);
 	add_history(input);
-	free(fd);
 	free(input);
 }
 
@@ -67,7 +60,7 @@ void	initialising(t_list *envp, char **comms, char *line)
 	nodes[1] = nodes[0];
 	while (comms[++i] != NULL)
 	{
-		comms[i] = expansion(comms[i], envp);
+		comms[i] = expansion(comms[i], envp, 0);
 		nodes[1] = linking(nodes[0], nodes[1], comms[i]);
 	}
 	free(comms);

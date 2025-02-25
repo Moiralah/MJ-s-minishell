@@ -33,10 +33,15 @@ char	*strnrplc(char *str, char *replace, int start, int len)
 	char	*after;
 
 	before = ft_substr(str, 0, start);
-	after = ft_substr(str, start + len, ft_strlen(str) - start - len);
-	str = ft_strjoin(before, replace);
-	str = ft_strjoin(str, after);
-	return (str);
+	after = ft_substr(str, start + len + 1, ft_strlen(str) - start - len);
+	if (replace)
+	{
+		free(str);
+		str = ft_strjoin(before, replace);
+		return (ft_strjoin(str, after));
+	}
+	free(str);
+	return (ft_strjoin(before, after));
 }
 
 int	strlist_len(char **strlist)

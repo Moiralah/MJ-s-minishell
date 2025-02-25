@@ -12,41 +12,32 @@
 
 #include "minishell.h"
 
-char	*expansion(char *str, t_list *envp)
+char	*expansion(char *str, t_list *envp, int i)
 {
-	char	*start;
+	char	*s;
 	char	*var_name;
 	char	*var_val;
-	int		i;
 
-	i = 0;
-	start = ft_strchr(str, '$');
-	while ((start) && (start[++i] != '\0'))
+	s = ft_strchr(str, '$');
+	while ((s) && (s[++i] != '\0'))
 	{
 		var_name = NULL;
-		if (start[i] == '?')
+		if (s[i] == '?')
 			printf("Exit Status Code: 1\n");
-		else if ((start[i] == ' ') || (start[i] == '$'))
-			var_name = ft_substr(start, 1, i - 1);
+		else if ((s[i + 1] == ' ') || (s[i + 1] == '$') || (s[i + 1] == '\0'))
+			var_name = ft_substr(s, 1, i);
 		if (!var_name)
 			continue ;
 		var_val = ft_getenv(var_name, envp);
 		free(var_name);
-		strnrplc(str, var_val, str - start, i - 1);
-		start = ft_strchr(str, '$');
+		if (*var_val == '\0')
+			continue ;
+		var_val = ft_strdup(var_val);
+		str = strnrplc(str, var_val, s - str, i);
+		s = ft_strchr(str, '$');
 		i = 0;
 	}
 	return (str);
-}
-
-void	run_node(t_node *start, t_node *cur, char **input)
-{
-	pipe_handling(&fd, (i - 1) * 2);
-	if (cur->run(cur->params, start, cur) == 1)
-	{
-		free(input[0]);
-		input[0] = strjoin_n_gnl(STDOUT_FILENO);
-	}
 }
 
 char	*find_path(char *params, t_list *envp)
@@ -57,6 +48,8 @@ char	*find_path(char *params, t_list *envp)
 	int		i;
 
 	path = ft_strdup(ft_getenv("PATH", envp));
+	if (*path == '\0')
+		return (NULL);
 	path_list = ft_split(path, ':');
 	free(path);
 	i = -1;
@@ -75,6 +68,26 @@ char	*find_path(char *params, t_list *envp)
 	return (right_path);
 }
 
+void	run_node(t_node **n, char **input, int *fd, int com_amnt)
+{
+	pid_t	pid;
+
+	pid = -2;
+	if (n[0]->built)
+		pid = fork();
+	if (pid == -1)
+		error_exit(strerror(errno), n[1], n[0]);
+	if (pid == 0)
+		pipe_handling(&fd, com_amnt);
+	if ((pid == -2) && (n[0]->run(n[0]->params, n[1], n[0]) == 1))
+	{
+		free(input[0]);
+		input[0] = strjoin_n_gnl(STDOUT_FILENO);
+	}
+	else if (pid == 0)
+		n[0]->run(n[0]->params, n[1], n[0]);
+}
+
 void	change_io(int *fd, int com_amnt, int q)
 {
 	if ((com_amnt != 1) && (q == 1))
@@ -86,7 +99,6 @@ void	change_io(int *fd, int com_amnt, int q)
 		dup2(fd[(2 * q) - 4], STDIN_FILENO);
 		dup2(fd[(2 * q) - 1], STDOUT_FILENO);
 	}
-	pipe_handling(&fd, (com_amnt - 1) * 2);
 }
 
 void	heredoc(char *str)

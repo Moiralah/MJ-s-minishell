@@ -42,7 +42,7 @@ char	*ft_getenv(char *key, t_list *envp)
 			return (temp->val);
 		temp = temp->next;
 	}
-	return (NULL);
+	return ("\0");
 }
 
 void	ft_setenv(t_list **envp, char *key, char *val, int overwrite)

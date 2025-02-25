@@ -38,6 +38,7 @@ typedef struct s_nodes
 	t_list			*envp;
 	char			**params;
 	int				(*run)(char **p, struct s_nodes *st, struct s_nodes *s);
+	int				built;
 	struct s_nodes	*next;
 }	t_node;
 
@@ -105,11 +106,11 @@ void	error_exit(char *str_error, t_node *start, t_node *cur);
 
 ////////////////////  More Generic Utils ///////////////////////////////////
 
-char	*expansion(char *str, t_list *envp);
+char	*expansion(char *str, t_list *envp, int i);
 
 char	*find_path(char *params, t_list *envp);
 
-void	run_node(t_node *start, t_node *cur, char **input);
+void	run_node(t_node **nodes, char **input, int *fd, int com_amnt);
 
 void	change_io(int *fd, int com_amnt, int q);
 

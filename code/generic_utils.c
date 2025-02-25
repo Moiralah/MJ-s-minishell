@@ -18,6 +18,8 @@ t_node	*function_matching(char *str)
 
 	comm_n_flags = ft_split(str, ' ');
 	free(str);
+	if (!comm_n_flags[0])
+		return (NULL);
 	if (!ft_strncmp("cd", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
 		return (create_cd_node(comm_n_flags));
 	else if (!ft_strncmp("echo", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
