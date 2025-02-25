@@ -41,19 +41,12 @@ char	*expansion(char *str, t_list *envp)
 
 char	*run_node(t_node *start, t_node cur, char **input)
 {
-	char	**comm;
-
-	comm = ft_calloc(3, sizof(char *));
-	comm[0] = ft_strdup("echo");
-	comm[1] = ft_strdup("-n");
-	comm[2] = NULL;
 	pipe_handling(&fd, (i - 1) * 2);
 	if (cur->run(cur->params, start, cur) == 1)
 	{
 		free(input[0]);
 		input[0] = strjoin_n_gnl(STDOUT_FILENO);
 	}
-	run_exec(comm, start, cur);
 }
 
 char	*find_path(char *params, t_list *envp)
