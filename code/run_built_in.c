@@ -1,34 +1,37 @@
 #include "minishell.h"
 
-int	run_cd(char **params, t_list *envp)
+int	run_cd(char **params, t_node *start_node, t_node *self)
 {
 	char	*new_path;
 	char	*home;
 
-	home = ft_getenv("HOME", envp);
+	if (strlist_len(params) != 1)
+		error_exit(NULL, start_node, self);
+	home = ft_getenv("HOME", start_node->envp);
 	if (!params[1] || !ft_strncmp(params[1], home, ft_strlen(params[1])))
 		new_path = home;
 	else if (params[1] && (params[1][0] == '-'))
-		new_path = ft_strdup(ft_getenv("OLDPWD", envp));
+		new_path = ft_strdup(ft_getenv("OLDPWD", start_node->envp));
 	else
 		new_path = params[1];
-	ft_setenv(&envp, "OLDPWD", getcwd(NULL, 0), 1);
+	ft_setenv(&(start_node->envp), "OLDPWD", getcwd(NULL, 0), 1);
 	if (chdir(new_path) == -1)
 	{
 		printf("bash: cd: %s: No such file or directory\n", new_path);
-		error_exit(NULL);
+		error_exit(NULL, start_node, self);
 	}
-	ft_setenv(&envp, "PWD", getcwd(NULL, 0), 1);
+	ft_setenv(&(start_node->envp), "PWD", getcwd(NULL, 0), 1);
 	if (params[1] && (params[1][0] == '-'))
 		free(new_path);
 	return (free2d(params), 0);
 }
 
-int	run_echo(char **params, t_list *envp)
+int	run_echo(char **params, t_node *start_node, t_node *self)
 {
 	int	i;
-	(void) envp;
 
+	(void) start_node;
+	(void) self;
 	i = 1;
 	while (params[i] && (ft_strncmp(params[i], "-n", 2) == 0))
 		i++;
@@ -44,22 +47,21 @@ int	run_echo(char **params, t_list *envp)
 	return (0);
 }
 
-int	run_pwd(char **params, t_list *envp)
+int	run_pwd(char **params, t_node *start_node, t_node *self)
 {
 	char	*cwd;
-	(void) envp;
 
-	free2d(params);
+	(void) start_node;
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
-		error_exit(strerror(errno));
-	//write(1, cwd, ft_strlen(cwd));
+		error_exit(strerror(errno), start_node, self);
 	printf("%s\n", cwd);
 	free(cwd);
+	free2d(params);
 	return (0);
 }
 
-int	run_export(char **params, t_list *envp)
+int	run_export(char **params, t_node *start_node, t_node *self)
 {
 	char	*key;
 	char	*val;
@@ -73,29 +75,33 @@ int	run_export(char **params, t_list *envp)
 			continue ;
 		q = ft_strchr(params[i], '=') - params[i];
 		if (q == 0)
-			error_exit(NULL);
+		{
+			printf("bash: export: %s: not a valid identifier", params[i]);
+			error_exit(NULL, start_node, self);
+		}
 		key = ft_substr(params[i], 0, q);
 		val = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);
-		ft_setenv(&envp, key, val, 1);
+		ft_setenv(&(start_node->envp), key, val, 1);
 	}
 	free2d(params);
 	return (0);
 }
 
-int	run_unset(char **params, t_list *envp)
+int	run_unset(char **params, t_node *start_node, t_node *self)
 {
 	t_list	*list[2];
 	int		i;
 
+	(void) self;
 	i = 0;
-	list[0] = envp;
+	list[0] = start_node->envp;
 	while (params[++i] != NULL)
 	{
 		while (list[0] != NULL)
 		{
 			if (ft_strlen(params[i]) == ft_strlen(list[0]->key)
 				&& (!ft_strncmp(list[0]->key, params[i], ft_strlen(params[i]))))
-				remove_link(envp, list[0], list[1]);
+				remove_link(&start_node->envp, list[0], list[1]);
 			else
 			{
 				list[1] = list[0];

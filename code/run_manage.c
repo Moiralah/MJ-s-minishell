@@ -1,10 +1,9 @@
 #include "minishell.h"
 
-int	run_redir(char **params, t_list *envp)
+int	run_redir(char **params, t_node *start_node, t_node *self)
 {
 	int	fd;
 
-	(void) envp;
 	if (params[0][0] == '<')
 		fd = open(params[1], O_CREAT, O_RDONLY);
 	else if (params[0][0] == '=')
@@ -14,7 +13,7 @@ int	run_redir(char **params, t_list *envp)
 	else if (params[0][0] == '?')
 		fd = open(params[1], O_APPEND, O_WRONLY);
 	if (fd == -1)
-		error_exit(strerror(errno));
+		error_exit(strerror(errno), start_node, self);
 	if (params[0][0] == '<')
 		dup2(fd, STDIN_FILENO);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
@@ -26,11 +25,12 @@ int	run_redir(char **params, t_list *envp)
 	return (free2d(params), 1);
 }
 
-int	run_env(char **params, t_list *envp)
+int	run_env(char **params, t_node *start_node, t_node *self)
 {
 	t_list	*temp;
 
-	temp = envp;
+	(void) self;
+	temp = start_node->envp;
 	while (temp != NULL)
 	{
 		printf("%s=%s\n", temp->key, temp->val);
@@ -40,7 +40,7 @@ int	run_env(char **params, t_list *envp)
 	return (0);
 }
 
-int	run_exec(char **params, t_list *envp)
+int	run_exec(char **params, t_node *start_node, t_node *self)
 {
 	t_list	*temp;
 	char	**arr_e;
@@ -48,7 +48,7 @@ int	run_exec(char **params, t_list *envp)
 	int		len;
 
 	len = 0;
-	temp = envp;
+	temp = start_node->envp;
 	while (temp != NULL)
 	{
 		len++;
@@ -56,15 +56,16 @@ int	run_exec(char **params, t_list *envp)
 	}
 	arr_e = ft_calloc(len + 1, sizeof(char *));
 	arr_e[len] = NULL;
+	temp = start_node->envp;
 	while (strlist_len(arr_e) < len)
 	{
-		line = ft_strjoin(ft_strdup(envp->key), ft_strdup("="));
-		arr_e[strlist_len(arr_e)] = ft_strjoin(line, ft_strdup(envp->val));
-		envp = envp->next;
+		line = ft_strjoin(ft_strdup(temp->key), ft_strdup("="));
+		arr_e[strlist_len(arr_e)] = ft_strjoin(line, ft_strdup(temp->val));
+		temp = temp->next;
 	}
 	line = ft_strjoin(ft_strdup("/usr/bin/"), ft_strdup(params[0]));
 	if (execve(line, params, arr_e) < 0)
-		error_exit(strerror(errno));
+		error_exit(strerror(errno), start_node, self);
 	return (0);
 }
 
@@ -85,11 +86,12 @@ int	legitnum(char *argv)
 	return (1);
 }
 
-int	run_exit(char **params, t_list *envp)
+int	run_exit(char **params, t_node *start_node, t_node *self)
 {
 	long long	exit_status;
 
-	(void) envp;
+	(void) self;
+	(void) start_node;
 	if (strlist_len(params) == 1)
 		exit(0);
 	if (strlist_len(params) >= 2 && legitnum(params[1]))
@@ -109,5 +111,6 @@ int	run_exit(char **params, t_list *envp)
 		ft_putstr_fd(": numeric argument required\n", 2);
 		exit(2);
 	}
+	free2d(params);
 	return (0);
 }

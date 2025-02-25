@@ -25,7 +25,7 @@ typedef struct s_nodes
 {
 	t_list			*envp;
 	char			**params;
-	int				(*run)(char **params, t_list *envp);
+	int				(*run)(char **p, struct s_nodes *st, struct s_nodes *s);
 	struct s_nodes	*next;
 }	t_node;
 
@@ -43,7 +43,7 @@ t_node	*create_export_node(char **to_set);
 
 t_node	*create_unset_node(char **to_unset);
 
-t_node	*create_exec_node(char **comm_n_flags);
+t_node	*create_exec_node(char **_n_flags);
 
 t_node	*create_exit_node(char **code);
 
@@ -53,23 +53,23 @@ t_node	*create_redir_node(char ch, char *filename);
 
 //////////////////// Run Node //////////////////////////////////////////
 
-int	run_cd(char **params, t_list *envp);
+int		run_cd(char **params, t_node *start_node, t_node *self);
 
-int	run_echo(char **params, t_list *envp);
+int		run_echo(char **params, t_node *start_node, t_node *self);
 
-int	run_pwd(char **params, t_list *envp);
+int		run_pwd(char **params, t_node *start_node, t_node *self);
 
-int	run_export(char **params, t_list *envp);
+int		run_export(char **params, t_node *start_node, t_node *self);
 
-int	run_unset(char **params, t_list *envp);
+int		run_unset(char **params, t_node *start_node, t_node *self);
 
-int	run_redir(char **params, t_list *envp);
+int		run_redir(char **params, t_node *start_node, t_node *self);
 
-int	run_env(char **params, t_list *envp);
+int		run_env(char **params, t_node *start_node, t_node *self);
 
-int	run_exec(char **params, t_list *envp);
+int		run_exec(char **params, t_node *start_node, t_node *self);
 
-int	run_exit(char **params, t_list *envp);
+int		run_exit(char **params, t_node *start_node, t_node *self);
 
 //////////////////// ENV Utils //////////////////////////////////////////
 
@@ -79,7 +79,7 @@ char	*ft_getenv(char *key, t_list *envp);
 
 void	ft_setenv(t_list **envp, char *key, char *val, int overwrite);
 
-void	close_pipe(int *pipe, int len);
+void	pipe_handling(int **pipe, int len);
 
 ////////////////////  Generic Utils ////////////////////////////////////////
 
@@ -89,9 +89,9 @@ char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch);
 
 void	heredoc(char *str);
 
-void	remove_link(t_list *head, t_list *cur, t_list *prev);
+void	remove_link(t_list **head, t_list *cur, t_list *prev);
 
-void	error_exit(char *str_error);
+void	error_exit(char *str_error, t_node *start, t_node *cur);
 
 ////////////////////  Signal Utils ////////////////////////////////////////
 
@@ -111,9 +111,9 @@ char	*strjoin_n_gnl(int fd);
 
 char	*strnrplc(char *str, char *replace, int start, int len);
 
-int	strlist_len(char **strlist);
+int		strlist_len(char **strlist);
 
-int	word_end(char *word, char *end_set, int print);
+int		word_end(char *word, char *end_set, int print);
 
 void	free_strlist(char **strlist, int index);
 

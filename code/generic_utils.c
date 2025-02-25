@@ -3,23 +3,22 @@
 t_node	*function_matching(char *str)
 {
 	char	**comm_n_flags;
-	char	*comm;
 
 	comm_n_flags = ft_split(str, ' ');
-	comm = comm_n_flags[0];
-	if (!ft_strncmp("cd", comm, ft_strlen(comm)))
+	free(str);
+	if (!ft_strncmp("cd", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
 		return (create_cd_node(comm_n_flags));
-	else if (!ft_strncmp("echo", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("echo", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
 		return (create_echo_node(comm_n_flags));
-	else if (!ft_strncmp("pwd", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("pwd", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
 		return (create_pwd_node(comm_n_flags));
-	else if (!ft_strncmp("export", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("export", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
 		return (create_export_node(comm_n_flags));
-	else if (!ft_strncmp("unset", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("unset", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
 		return (create_unset_node(comm_n_flags));
-	else if (!ft_strncmp("env", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("env", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
 		return (create_env_node(comm_n_flags));
-	else if (!ft_strncmp("exit", comm, ft_strlen(comm)))
+	else if (!ft_strncmp("exit", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
 		return (create_exit_node(comm_n_flags));
 	return (create_exec_node(comm_n_flags));
 }
@@ -65,19 +64,38 @@ void	heredoc(char *str)
 	}
 }
 
-void	remove_link(t_list *head, t_list *cur, t_list *prev)
+void	remove_link(t_list **head, t_list *cur, t_list *prev)
 {
 	free(cur->key);
 	free(cur->val);
-	if (cur == head)
-		head = head->next;
+	if (cur == head[0])
+		head[0] = head[0]->next;
 	else
 		prev->next = cur->next;
 	free(cur);
 }
 
-void	error_exit(char *error_str)
+void	error_exit(char *error_str, t_node *start, t_node *cur)
 {
+	t_node	*temp;
+	int		to_free;
+
 	printf("Error: %s\n", error_str);
-	exit(-1);
+	to_free = 0;
+	while (start->envp != NULL)
+		remove_link(&(start->envp), start->envp, NULL);
+	temp = start;
+	start = start->next;
+	free(temp);
+	while (start != NULL)
+	{
+		temp = start;
+		start = start->next;
+		if (start == cur)
+			to_free = 1;
+		if (to_free)
+			free2d(start->params);
+		free(start);
+	}
+	exit(1);
 }

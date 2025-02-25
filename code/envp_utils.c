@@ -62,13 +62,27 @@ void	ft_setenv(t_list **envp, char *key, char *val, int overwrite)
 		node[0]->next = node[1];
 }
 
-void	close_pipe(int *pipe, int len)
+void	pipe_handling(int **fd, int len)
 {
-	int	i;
+	int		i;
 
 	i = -1;
+	if (len == 0)
+		return ;
+	if (fd[0] == NULL)
+	{
+		if (len <= 1)
+			fd[0] = ft_calloc(2, sizeof(int));
+		else
+			fd[0] = ft_calloc((len - 1) * 2, sizeof(int));
+		if (len <= 1)
+			len = 2;
+		while (++i < (len - 1))
+			pipe(fd[0] + (2 * i));
+		return ;
+	}
 	while (++i < len)
-		close(pipe[i]);
+		close(fd[0][i]);
 }
 
 char	*strjoin_n_gnl(int fd)
