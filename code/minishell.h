@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
-# ifdef MINISHELL_H
+# define MINISHELL_H
 # include <errno.h>
 # include <unistd.h>
 # include <stdlib.h>
