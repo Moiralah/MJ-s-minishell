@@ -37,8 +37,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 $(LIBFT_A):
 	make -C $(LIBFT)
 
-.PHONY: all, clean, fclean, re
-
 all: $(NAME)
 
 clean:
@@ -53,3 +51,5 @@ fclean: clean
 	clear
 
 re: fclean all
+
+.PHONY: all clean fclean re
