@@ -1,30 +1,18 @@
 #include "minishell.h"
 
-char	*expansion(char *str, t_list *envp)
+char	*strjoin_n_gnl(int fd)
 {
-	char	*start;
-	char	*var_name;
-	char	*var_val;
-	int		i;
+	char	*line;
+	char	*temp;
 
-	i = 0;
-	start = ft_strchr(str, '$');
-	while ((start) && (start[++i] != '\0'))
+	line = ft_calloc(1, sizeof(char));
+	temp = get_next_line(fd);
+	while (temp != NULL)
 	{
-		var_name = NULL;
-		if (start[i] == '?')
-			printf("Exit Status Code: 1\n");
-		else if ((start[i] == ' ') || (start[i] == '$'))
-			var_name = ft_substr(start, 1, i - 1);
-		if (!var_name)
-			continue ;
-		var_val = ft_getenv(var_name, envp);
-		free(var_name);
-		strnrplc(str, var_val, str - start, i - 1);
-		start = ft_strchr(str, '$');
-		i = 0;
+		line = ft_strjoin(line, temp);
+		temp = get_next_line(fd);
 	}
-	return (str);
+	return (line);
 }
 
 char	*strnrplc(char *str, char *replace, int start, int len)

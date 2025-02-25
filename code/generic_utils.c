@@ -52,16 +52,27 @@ char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
 	return (comm);
 }
 
-void	heredoc(char *str)
+void	pipe_handling(int **fd, int len)
 {
-	char	*line;
+	int	i;
 
-	line = readline(">");
-	while (ft_strncmp(line, str, ft_strlen(str)) != 0)
+	i = -1;
+	if (len == 0)
+		return ;
+	if (fd[0] == NULL)
 	{
-		free(line);
-		line = readline(">");
+		if (len <= 1)
+			fd[0] = ft_calloc(2, sizeof(int));
+		else
+			fd[0] = ft_calloc((len - 1) * 2, sizeof(int));
+		if (len <= 1)
+			len = 2;
+		while (++i < (len - 1))
+			pipe(fd[0] + (2 * i));
+		return ;
 	}
+	while (++i < len)
+		close(fd[0][i]);
 }
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev)

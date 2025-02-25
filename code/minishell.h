@@ -79,19 +79,27 @@ char	*ft_getenv(char *key, t_list *envp);
 
 void	ft_setenv(t_list **envp, char *key, char *val, int overwrite);
 
-void	pipe_handling(int **pipe, int len);
-
 ////////////////////  Generic Utils ////////////////////////////////////////
 
 t_node	*function_matching(char *str);
 
 char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch);
 
-void	heredoc(char *str);
+void	pipe_handling(int **pipe, int len);
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev);
 
 void	error_exit(char *str_error, t_node *start, t_node *cur);
+
+////////////////////  More Generic Utils ///////////////////////////////////
+
+char	*expansion(char *str, t_list *envp);
+
+void	change_io(pid_t pid, int *fd, int com_amnt, int q);
+
+void	run_node(pid_t pid, t_node *start, t_node cur, char *input);
+
+void	heredoc(char *str);
 
 ////////////////////  Signal Utils ////////////////////////////////////////
 
@@ -104,8 +112,6 @@ void	init_signal(void);
 void	restore_signal(void);
 
 ////////////////////  Str Utils ////////////////////////////////////////
-
-char	*expansion(char *str, t_list *envp);
 
 char	*strjoin_n_gnl(int fd);
 

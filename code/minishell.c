@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-void	executing(t_node *start, char *line, int i)
+void	executing(t_node *start, char *input, int i)
 {
 	t_node	*cur;
 	pid_t	pid;
@@ -16,36 +16,15 @@ void	executing(t_node *start, char *line, int i)
 		pid = fork();
 		if (pid < 0)
 			error_exit(strerror(errno), start, cur);
-		else if ((pid == 0) && (i != 1) && (q == 1))
-			dup2(fd[1], STDOUT_FILENO);
-		else if ((pid == 0) && (i != 1) && (q == i))
-			dup2(fd[(q * 2) - 4], STDIN_FILENO);
-		else if ((pid == 0) && (i != 1))
-		{
-			dup2(fd[(2 * q) - 4], STDIN_FILENO);
-			dup2(fd[(2 * q) - 1], STDOUT_FILENO);
-		}
-		if (pid == 0)
-		{
-			pipe_handling(&fd, (i - 1) * 2);
-			if (cur->run(cur->params, start, cur) == 1)
-			{
-				free(line);
-				line = strjoin_n_gnl(STDOUT_FILENO);
-			}
-			char	*comm[3];
-			comm[0] = "echo";
-			comm[1] = "-n";
-			comm[2] = NULL;
-			run_exec(comm, start, cur);
-		}
+		change_io(pid, fd, i, q);
+		input = run_node(pid, start, cur, input);
 		cur = cur->next;
 	}
 	pipe_handling(&fd, (i - 1) * 2);
 	waitpid(-1, NULL, 0);
+	add_history(input);
 	free(fd);
-	add_history(line);
-	free(line);
+	free(input);
 }
 
 t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
