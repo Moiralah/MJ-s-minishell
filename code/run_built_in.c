@@ -88,7 +88,7 @@ int	run_export(char **params, t_node *start_node, t_node *self)
 		q = ft_strchr(params[i], '=') - params[i];
 		if (q == 0)
 		{
-			printf("bash: export: %s: not a valid identifier", params[i]);
+			printf("bash: export: %s: not a valid identifier\n", params[i]);
 			error_exit(NULL, start_node, self);
 		}
 		key = ft_substr(params[i], 0, q);

@@ -107,9 +107,9 @@ void	error_exit(char *str_error, t_node *start, t_node *cur);
 
 char	*expansion(char *str, t_list *envp);
 
-char	*run_node(t_node *start, t_node cur, char *input);
-
 char	*find_path(char *params, t_list *envp);
+
+void	run_node(t_node *start, t_node *cur, char **input);
 
 void	change_io(int *fd, int com_amnt, int q);
 

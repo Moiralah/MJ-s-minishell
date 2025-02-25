@@ -76,6 +76,7 @@ int	run_exec(char **params, t_node *start_node, t_node *self)
 		temp = temp->next;
 	}
 	line = ft_strjoin(ft_strdup("/usr/bin/"), ft_strdup(params[0]));
+	//line = find_path(params[0], start_node->envp);
 	if (execve(line, params, arr_e) < 0)
 		error_exit(strerror(errno), start_node, self);
 	return (0);
