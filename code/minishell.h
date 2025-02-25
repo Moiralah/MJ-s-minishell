@@ -95,9 +95,11 @@ void	error_exit(char *str_error, t_node *start, t_node *cur);
 
 char	*expansion(char *str, t_list *envp);
 
-void	change_io(pid_t pid, int *fd, int com_amnt, int q);
+char	*run_node(t_node *start, t_node cur, char *input);
 
-void	run_node(pid_t pid, t_node *start, t_node cur, char *input);
+char	*find_path(char *params, t_list *envp);
+
+void	change_io(int *fd, int com_amnt, int q);
 
 void	heredoc(char *str);
 

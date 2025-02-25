@@ -1,23 +1,24 @@
 #include "minishell.h"
 
-void	executing(t_node *start, char *input, int i)
+void	executing(t_node *start, char *input, int i, int q)
 {
 	t_node	*cur;
 	pid_t	pid;
 	int		*fd;
-	int		q;
 
 	fd = NULL;
 	pipe_handling(&fd, i);
-	q = 0;
 	cur = start->next;
 	while ((cur != NULL) && (++q))
 	{
 		pid = fork();
 		if (pid < 0)
 			error_exit(strerror(errno), start, cur);
-		change_io(pid, fd, i, q);
-		input = run_node(pid, start, cur, input);
+		if (!pid)
+		{
+			change_io(pid, fd, i, q);
+			input = run_node(pid, start, cur, input);
+		}
 		cur = cur->next;
 	}
 	pipe_handling(&fd, (i - 1) * 2);
@@ -60,7 +61,7 @@ void	initialising(t_list *envp, char **comms, char *line)
 	free(comms);
 	nodes[0]->envp = envp;
 	nodes[1] = nodes[0];
-	executing(nodes[1], line, i);
+	executing(nodes[1], line, i, 0);
 	while (nodes[0] != NULL)
 	{
 		nodes[1] = nodes[0];

@@ -27,7 +27,24 @@ char	*expansion(char *str, t_list *envp)
 	return (str);
 }
 
-char	find_path(charparams, t_list *envp)
+char	*run_node(t_node *start, t_node cur, char **input)
+{
+	char	**comm;
+
+	comm = ft_calloc(3, sizof(char *));
+	comm[0] = ft_strdup("echo");
+	comm[1] = ft_strdup("-n");
+	comm[2] = NULL;
+	pipe_handling(&fd, (i - 1) * 2);
+	if (cur->run(cur->params, start, cur) == 1)
+	{
+		free(input[0]);
+		input[0] = strjoin_n_gnl(STDOUT_FILENO);
+	}
+	run_exec(comm, start, cur);
+}
+
+char	*find_path(char *params, t_list *envp)
 {
 	char	**path_list;
 	char	*right_path;
@@ -64,27 +81,6 @@ void	change_io(pid_t pid, int *fd, int com_amnt, int q)
 		dup2(fd[(2 * q) - 4], STDIN_FILENO);
 		dup2(fd[(2 * q) - 1], STDOUT_FILENO);
 	}
-}
-
-void	run_node(pid_t pid, t_node *start, t_node cur, char *input)
-{
-	char	**comm;
-
-	comm = ft_calloc(3, sizof(char *));
-	comm[0] = ft_strdup("echo");
-	comm[1] = ft_strdup("-n");
-	comm[2] = NULL;
-	if (pid == 0)
-	{
-		pipe_handling(&fd, (i - 1) * 2);
-		if (cur->run(cur->params, start, cur) == 1)
-		{
-			free(input);
-			input = strjoin_n_gnl(STDOUT_FILENO);
-		}
-		run_exec(comm, start, cur);
-	}
-	free2d(comm);
 }
 
 void	heredoc(char *str)
