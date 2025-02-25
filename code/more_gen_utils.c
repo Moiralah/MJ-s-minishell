@@ -41,16 +41,7 @@ char	*expansion(char *str, t_list *envp)
 
 void	run_node(t_node *start, t_node *cur, char **input)
 {
-<<<<<<< HEAD
 	pipe_handling(&fd, (i - 1) * 2);
-=======
-	char	**comm;
-
-	comm = ft_calloc(3, sizeof(char *));
-	comm[0] = ft_strdup("echo");
-	comm[1] = ft_strdup("-n");
-	comm[2] = NULL;
->>>>>>> aee54d58b17a6d8f1cfb39637aa00944ad71e317
 	if (cur->run(cur->params, start, cur) == 1)
 	{
 		free(input[0]);
