@@ -74,5 +74,6 @@ char		*extract_line(char *buffer_all, int check);
 char		*get_next_line(int fd);
 void		free2d(char **str);
 long long	ft_atoll(const char *str);
+int			ft_strcmp(const char *s1, const char *s2);
 
 #endif

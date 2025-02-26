@@ -91,12 +91,12 @@ void	pipe_handling(int **fd, int len)
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev)
 {
-	free(cur->key);
-	free(cur->val);
 	if (cur == head[0])
 		head[0] = head[0]->next;
 	else
 		prev->next = cur->next;
+	free(cur->key);
+	free(cur->val);
 	free(cur);
 }
 
