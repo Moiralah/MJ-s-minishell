@@ -110,6 +110,8 @@ int	run_unset(char **params, t_node *start_node, t_node *self)
 	if (strlist_len(params) == 1)
 		printf("bash: unset: not enough arguments\n");
 	i = 0;
+	list[0] = start_node->envp;
+	printf("Running unsetting\n");
 	while (params[++i] != NULL)
 	{
 		list[0] = start_node->envp;
@@ -118,13 +120,8 @@ int	run_unset(char **params, t_node *start_node, t_node *self)
 			if (!ft_strcmp(list[0]->key, params[i]))
 			{
 				remove_link(&start_node->envp, list[0], list[1]);
-				break ;
-			}
-			else
-			{
-				list[1] = list[0];
-				list[0] = list[0]->next;
-			}
+			list[1] = list[0];
+			list[0] = list[0]->next;
 		}
 	}
 	return (free2d(params), 0);

@@ -44,7 +44,7 @@ typedef struct s_nodes
 
 //////////////////// Create Node ////////////////////////////////////////
 
-t_node	*create_generic_node(void);
+t_node	*create_pipe_node(int *fd, int i, int final);
 
 t_node	*create_cd_node(char **path);
 
@@ -75,6 +75,8 @@ int		run_pwd(char **params, t_node *start_node, t_node *self);
 int		run_export(char **params, t_node *start_node, t_node *self);
 
 int		run_unset(char **params, t_node *start_node, t_node *self);
+
+int		run_pipe(char **params, t_node *start_node, t_node *self);
 
 int		run_redir(char **params, t_node *start_node, t_node *self);
 
@@ -110,9 +112,9 @@ char	*expansion(char *str, t_list *envp, int i);
 
 char	*find_path(char *params, t_list *envp);
 
-void	run_node(t_node **nodes, char **input, int *fd, int com_amnt);
+int		legitnum(char *str);
 
-void	change_io(int *fd, int com_amnt, int q);
+void	run_node(t_node **nodes, char **input, int *fd, int com_amnt);
 
 void	heredoc(char *str);
 
