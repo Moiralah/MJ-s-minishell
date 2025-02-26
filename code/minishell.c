@@ -12,18 +12,14 @@
 
 #include "minishell.h"
 
-void	executing(t_node *start, char *input, int com_amnt, int q)
+void	executing(t_node *start, int *fd, int com_amnt, char *input)
 {
 	t_node	*nodes[2];
-	int		*fd;
 
-	fd = NULL;
-	nodes[0] = start->next;
+	nodes[0] = start;
 	nodes[1] = start;
-	pipe_handling(&fd, com_amnt);
-	while ((nodes[0] != NULL) && (++q))
+	while (nodes[0] != NULL)
 	{
-		change_io(fd, com_amnt, q);
 		run_node(nodes, &input, fd, com_amnt);
 		nodes[0] = nodes[0]->next;
 	}
@@ -35,38 +31,32 @@ void	executing(t_node *start, char *input, int com_amnt, int q)
 
 t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
 {
-	char	*input;
-	char	*err_line;
-
-	input = NULL;
-	err_line = "grep: (standard input): input file is also the output";
+	comm = expansion(comm, start_node->envp, 0);
 	comm = fnames_to_nodes(&cur_node, comm, '<');
-	if ((cur_node) && (cur_node->params))
-		input = cur_node->params[1];
 	comm = fnames_to_nodes(&cur_node, comm, '>');
-	if (input && !ft_strcmp(input, cur_node->params[1]))
-		error_exit(err_line, start_node, cur_node);
 	cur_node->next = function_matching(comm);
 	return (cur_node->next);
 }
 
-void	initialising(t_list *envp, char **comms, char *line)
+void	initialising(t_list *envp, char **comms, char *line, int *fd)
 {
 	t_node	*nodes[2];
 	int		i;
 
 	i = -1;
-	nodes[0] = create_generic_node();
+	pipe_handling(&fd, strlist_len(comms));
+	nodes[0] = create_pipe_node(fd, 0, strlist_len(comms));
 	nodes[1] = nodes[0];
 	while (comms[++i] != NULL)
 	{
-		comms[i] = expansion(comms[i], envp, 0);
 		nodes[1] = linking(nodes[0], nodes[1], comms[i]);
+		nodes[1]->next = create_pipe_node(fd, i, strlist_len(comms));
+		nodes[1] = nodes[1]->next;
 	}
 	free(comms);
 	nodes[0]->envp = envp;
 	nodes[1] = nodes[0];
-	executing(nodes[1], line, i, 0);
+	executing(nodes[1], fd, i, line);
 	while (nodes[0] != NULL)
 	{
 		nodes[1] = nodes[0];
@@ -116,7 +106,7 @@ int	main(int argc, char **argv, char **local_envp)
 	{
 		init_signal();
 		input = listening(0, 0);
-		initialising(envp, ft_split(input, '|'), input);
+		initialising(envp, ft_split(input, '|'), input, NULL);
 	}
 	while (envp != NULL)
 		remove_link(&envp, envp, NULL);

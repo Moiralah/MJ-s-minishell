@@ -12,15 +12,20 @@
 
 #include "minishell.h"
 
-t_node	*create_generic_node(void)
+t_node	*create_pipe_node(int *fd, int i, int len)
 {
 	t_node	*new_node;
+	char	*params[4];
 
+	params[0] = (char *)fd;
+	params[1] = ft_itoa(i);
+	params[2] = ft_itoa(len);
+	params[3] = NULL;
 	new_node = ft_calloc(1, sizeof(t_node));
 	new_node->envp = NULL;
-	new_node->params = NULL;
-	new_node->run = NULL;
-	new_node->built = 0;
+	new_node->params = params;
+	new_node->run = run_pipe;
+	new_node->built = 1;
 	new_node->next = NULL;
 	return (new_node);
 }

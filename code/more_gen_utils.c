@@ -64,36 +64,41 @@ char	*find_path(char *params, t_list *envp)
 	return (path);
 }
 
+int	legitnum(char *str)
+{
+	if (!str || !*str)
+		return (0);
+	if (str[0] == '-' || str[0] == '+')
+		str++;
+	if (!*str)
+		return (0);
+	while (*str)
+	{
+		if (!ft_isdigit(*str))
+			return (0);
+		str++;
+	}
+	return (1);
+}
+
 void	run_node(t_node **n, char **input, int *fd, int com_amnt)
 {
 	pid_t	pid;
 
 	pid = -2;
-	if (n[0]->built)
+	if (!n[0]->built)
 		pid = fork();
 	if (pid == -1)
 		error_exit(strerror(errno), n[1], n[0]);
-	if (pid == 0)
-		pipe_handling(&fd, com_amnt);
 	if ((pid == -2) && (n[0]->run(n[0]->params, n[1], n[0]) == 1))
 	{
 		free(input[0]);
 		input[0] = strjoin_n_gnl(STDOUT_FILENO);
 	}
 	else if (pid == 0)
-		n[0]->run(n[0]->params, n[1], n[0]);
-}
-
-void	change_io(int *fd, int com_amnt, int q)
-{
-	if ((com_amnt != 1) && (q == 1))
-		dup2(fd[1], STDOUT_FILENO);
-	else if ((com_amnt != 1) && (q == com_amnt))
-		dup2(fd[(q * 2) - 4], STDIN_FILENO);
-	else if (com_amnt != 1)
 	{
-		dup2(fd[(2 * q) - 4], STDIN_FILENO);
-		dup2(fd[(2 * q) - 1], STDOUT_FILENO);
+		pipe_handling(&fd, com_amnt);
+		n[0]->run(n[0]->params, n[1], n[0]);
 	}
 }
 

@@ -12,6 +12,31 @@
 
 #include "minishell.h"
 
+int	run_pipe(char **params, t_node *start_node, t_node *self)
+{
+	int	*fd;
+	int	q;
+	int	l;
+
+	(void) start_node;
+	(void) self;
+	fd = (int *)params[0];
+	q = ft_atoi(params[1]);
+	l = ft_atoi(params[2]);
+	if (q == l)
+		return (-1);
+	if (q == 1)
+		dup2(fd[1], STDOUT_FILENO);
+	else if (q == (l - 1))
+		dup2(fd[(q * 2) - 4], STDIN_FILENO);
+	else
+	{
+		dup2(fd[(q * 2) - 4], STDIN_FILENO);
+		dup2(fd[(q * 2) - 1], STDOUT_FILENO);
+	}
+	return (0);
+}
+
 int	run_redir(char **params, t_node *start_node, t_node *self)
 {
 	int	fd;
@@ -62,7 +87,8 @@ int	run_exec(char **params, t_node *start_node, t_node *self)
 	int		len;
 
 	temp = start_node->envp;
-	len = ft_lstsize(temp);
+	while ((temp != NULL) && (len++))
+		temp = temp->next;
 	arr_e = ft_calloc(len + 1, sizeof(char *));
 	arr_e[len] = NULL;
 	temp = start_node->envp;
@@ -73,30 +99,10 @@ int	run_exec(char **params, t_node *start_node, t_node *self)
 		temp = temp->next;
 	}
 	line = find_path(params[0], start_node->envp);
-	if (execve(line, params, arr_e) < 0)
-	{
-		free2d(arr_e);
-		free(line);
-		error_exit(strerror(errno), start_node, self);
-	}
-	return (0);
-}
-
-int	legitnum(char *argv)
-{
-	if (!argv || !*argv)
-		return (0);
-	if (argv[0] == '-' || argv[0] == '+')
-		argv++;
-	if (!*argv)
-		return (0);
-	while (*argv)
-	{
-		if (!ft_isdigit(*argv))
-			return (0);
-		argv++;
-	}
-	return (1);
+	execve(line, params, arr_e);
+	free2d(arr_e);
+	free(line);
+	return (error_exit(strerror(errno), start_node, self), 0);
 }
 
 int	run_exit(char **params, t_node *start_node, t_node *self)
