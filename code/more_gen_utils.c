@@ -43,29 +43,25 @@ char	*expansion(char *str, t_list *envp, int i)
 char	*find_path(char *params, t_list *envp)
 {
 	char	**path_list;
-	char	*right_path;
 	char	*path;
 	int		i;
 
-	path = ft_strdup(ft_getenv("PATH", envp));
-	if (*path == '\0')
-		return (NULL);
+	path = ft_getenv("PATH", envp);
 	path_list = ft_split(path, ':');
-	free(path);
-	i = -1;
 	if (access(params, F_OK) == 0)
-		return (params);
+	return (params);
+	i = -1;
 	while (path_list[++i] != NULL)
 	{
-		right_path = ft_strjoin("/", ft_strdup(params));
-		right_path = ft_strjoin(path_list[i], right_path);
-		if (access(right_path, F_OK) == 0)
+		path = ft_strjoin(ft_strdup("/"), ft_strdup(params));
+		path = ft_strjoin(ft_strdup(path_list[i]), path);
+		if (access(path, F_OK) == 0)
 			break ;
-		free(right_path);
-		right_path = NULL;
+		free(path);
+		path = NULL;
 	}
 	free2d(path_list);
-	return (right_path);
+	return (path);
 }
 
 void	run_node(t_node **n, char **input, int *fd, int com_amnt)
