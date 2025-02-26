@@ -20,19 +20,19 @@ t_node	*function_matching(char *str)
 	free(str);
 	if (!comm_n_flags[0])
 		return (NULL);
-	if (!ft_strncmp("cd", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
+	if (!ft_strcmp("cd", comm_n_flags[0]))
 		return (create_cd_node(comm_n_flags));
-	else if (!ft_strncmp("echo", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
+	else if (!ft_strcmp("echo", comm_n_flags[0]))
 		return (create_echo_node(comm_n_flags));
-	else if (!ft_strncmp("pwd", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
+	else if (!ft_strcmp("pwd", comm_n_flags[0]))
 		return (create_pwd_node(comm_n_flags));
-	else if (!ft_strncmp("export", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
+	else if (!ft_strcmp("export", comm_n_flags[0]))
 		return (create_export_node(comm_n_flags));
-	else if (!ft_strncmp("unset", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
+	else if (!ft_strcmp("unset", comm_n_flags[0]))
 		return (create_unset_node(comm_n_flags));
-	else if (!ft_strncmp("env", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
+	else if (!ft_strcmp("env", comm_n_flags[0]))
 		return (create_env_node(comm_n_flags));
-	else if (!ft_strncmp("exit", comm_n_flags[0], ft_strlen(comm_n_flags[0])))
+	else if (!ft_strcmp("exit", comm_n_flags[0]))
 		return (create_exit_node(comm_n_flags));
 	return (create_exec_node(comm_n_flags));
 }

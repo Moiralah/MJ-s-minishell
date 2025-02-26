@@ -102,7 +102,7 @@ void	heredoc(char *str)
 	char	*line;
 
 	line = readline(">");
-	while (ft_strncmp(line, str, ft_strlen(str)) != 0)
+	while (ft_strcmp(line, str) != 0)
 	{
 		free(line);
 		line = readline(">");

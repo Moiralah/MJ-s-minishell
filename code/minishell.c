@@ -44,7 +44,7 @@ t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
 	if ((cur_node) && (cur_node->params))
 		input = cur_node->params[1];
 	comm = fnames_to_nodes(&cur_node, comm, '>');
-	if (input && !ft_strncmp(input, cur_node->params[1], ft_strlen(input)))
+	if (input && !ft_strcmp(input, cur_node->params[1]))
 		error_exit(err_line, start_node, cur_node);
 	cur_node->next = function_matching(comm);
 	return (cur_node->next);
