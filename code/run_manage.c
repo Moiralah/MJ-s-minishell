@@ -17,13 +17,13 @@ int	run_redir(char **params, t_node *start_node, t_node *self)
 	int	fd;
 
 	if (params[0][0] == '<')
-		fd = open(params[1], O_CREAT, O_RDONLY);
+		fd = open(params[1], O_CREAT | O_RDONLY, 0666);
 	else if (params[0][0] == '=')
 		heredoc(params[1]);
 	else if (params[0][0] == '>')
-		fd = open(params[1], O_CREAT, O_WRONLY);
+		fd = open(params[1], O_CREAT | O_WRONLY | O_TRUNC, 0666);
 	else if (params[0][0] == '?')
-		fd = open(params[1], O_APPEND, O_WRONLY);
+		fd = open(params[1], O_CREAT | O_WRONLY | O_APPEND, 0666);
 	if (fd == -1)
 		error_exit(strerror(errno), start_node, self);
 	if (params[0][0] == '<')
@@ -61,13 +61,8 @@ int	run_exec(char **params, t_node *start_node, t_node *self)
 	char	*line;
 	int		len;
 
-	len = 0;
 	temp = start_node->envp;
-	while (temp != NULL)
-	{
-		len++;
-		temp = temp->next;
-	}
+	len = ft_lstsize(temp);
 	arr_e = ft_calloc(len + 1, sizeof(char *));
 	arr_e[len] = NULL;
 	temp = start_node->envp;

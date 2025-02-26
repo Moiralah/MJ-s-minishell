@@ -20,7 +20,7 @@ int	run_cd(char **params, t_node *start_node, t_node *self)
 	if (strlist_len(params) > 2)
 		error_exit(NULL, start_node, self);
 	home = ft_getenv("HOME", start_node->envp);
-	if (!params[1] || !ft_strcmp(params[1], home))
+	if (!params[1] || !ft_strcmp(params[1], home) || params[1][0] == '~')
 		new_path = home;
 	else if (params[1] && (params[1][0] == '-'))
 		new_path = ft_strdup(ft_getenv("OLDPWD", start_node->envp));

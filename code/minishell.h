@@ -138,6 +138,8 @@ int		word_end(char *word, char *end_set, int print);
 
 void	free_strlist(char **strlist, int index);
 
+int		ft_lstsize(t_list *lst);
+
 ////////////////////  END ///////////////////////////////////////////////
 
 #endif

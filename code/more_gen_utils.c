@@ -49,7 +49,7 @@ char	*find_path(char *params, t_list *envp)
 	path = ft_getenv("PATH", envp);
 	path_list = ft_split(path, ':');
 	if (access(params, F_OK) == 0)
-	return (params);
+		return (params);
 	i = -1;
 	while (path_list[++i] != NULL)
 	{
