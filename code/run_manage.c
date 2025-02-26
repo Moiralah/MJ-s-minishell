@@ -86,6 +86,7 @@ int	run_exec(char **params, t_node *start_node, t_node *self)
 	char	*line;
 	int		len;
 
+	len = 0;
 	temp = start_node->envp;
 	while ((temp != NULL) && (len++))
 		temp = temp->next;

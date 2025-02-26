@@ -90,18 +90,3 @@ void	free_strlist(char **strlist, int index)
 	if (index < 0)
 		free(strlist);
 }
-
-int	ft_lstsize(t_list *lst)
-{
-	int		i;
-	t_list	*temp;
-
-	i = 0;
-	temp = lst;
-	while (temp != NULL)
-	{
-		i++;
-		temp = temp->next;
-	}
-	return (i);
-}
