@@ -29,12 +29,15 @@ t_node	*create_exec_node(char **comm_n_flags)
 {
 	t_node	*new_node;
 	char	*trimmed;
+	char	to_trim[2];
 	int		i;
 
 	i = -1;
+	to_trim[0] = '"';
+	to_trim[1] = '\0';
 	while (comm_n_flags[++i] != NULL)
 	{
-		trimmed = ft_strtrim(comm_n_flags[i], """");
+		trimmed = ft_strtrim(comm_n_flags[i], to_trim);
 		free(comm_n_flags[i]);
 		comm_n_flags[i] = trimmed;
 	}
@@ -51,12 +54,15 @@ t_node	*create_exit_node(char **code)
 {
 	t_node	*new_node;
 	char	*trimmed;
+	char	to_trim[2];
 	int		i;
 
 	i = -1;
+	to_trim[0] = '"';
+	to_trim[1] = '\0';
 	while (code[++i] != NULL)
 	{
-		trimmed = ft_strtrim(code[i], """");
+		trimmed = ft_strtrim(code[i], to_trim);
 		free(code[i]);
 		code[i] = trimmed;
 	}

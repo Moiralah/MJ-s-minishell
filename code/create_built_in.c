@@ -16,12 +16,15 @@ t_node	*create_cd_node(char **path)
 {
 	t_node	*new_node;
 	char	*trimmed;
+	char	to_trim[2];
 	int		i;
 
 	i = -1;
+	to_trim[0] = '"';
+	to_trim[1] = '\0';
 	while (path[++i] != NULL)
 	{
-		trimmed = ft_strtrim(path[i], """");
+		trimmed = ft_strtrim(path[i], to_trim);
 		free(path[i]);
 		path[i] = trimmed;
 	}
@@ -38,12 +41,15 @@ t_node	*create_echo_node(char **to_print)
 {
 	t_node	*new_node;
 	char	*trimmed;
+	char	to_trim[2];
 	int		i;
 
 	i = -1;
+	to_trim[0] = '"';
+	to_trim[1] = '\0';
 	while (to_print[++i] != NULL)
 	{
-		trimmed = ft_strtrim(to_print[i], """");
+		trimmed = ft_strtrim(to_print[i], to_trim);
 		free(to_print[i]);
 		to_print[i] = trimmed;
 	}
@@ -73,12 +79,15 @@ t_node	*create_export_node(char **to_set)
 {
 	t_node	*new_node;
 	char	*trimmed;
+	char	to_trim[2];
 	int		i;
 
 	i = -1;
+	to_trim[0] = '"';
+	to_trim[1] = '\0';
 	while (to_set[++i] != NULL)
 	{
-		trimmed = ft_strtrim(to_set[i], """");
+		trimmed = ft_strtrim(to_set[i], to_trim);
 		free(to_set[i]);
 		to_set[i] = trimmed;
 	}
@@ -95,12 +104,15 @@ t_node	*create_unset_node(char **to_unset)
 {
 	t_node	*new_node;
 	char	*trimmed;
+	char	to_trim[2];
 	int		i;
 
 	i = -1;
+	to_trim[0] = '"';
+	to_trim[1] = '\0';
 	while (to_unset[++i] != NULL)
 	{
-		trimmed = ft_strtrim(to_unset[i], """");
+		trimmed = ft_strtrim(to_unset[i], to_trim);
 		free(to_unset[i]);
 		to_unset[i] = trimmed;
 	}

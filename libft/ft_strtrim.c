@@ -18,8 +18,10 @@ static int	is_in_set(char const c, char const *set)
 
 	i = -1;
 	while (set[++i])
+	{
 		if (set[i] == c)
 			return (1);
+	}
 	return (0);
 }
 
