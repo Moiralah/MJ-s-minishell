@@ -17,7 +17,7 @@ int	run_cd(char **params, t_node *start_node, t_node *self)
 	char	*new_path;
 	char	*home;
 
-	if (strlist_len(params) != 1)
+	if (strlist_len(params) > 2)
 		error_exit(NULL, start_node, self);
 	home = ft_getenv("HOME", start_node->envp);
 	if (!params[1] || !ft_strncmp(params[1], home, ft_strlen(params[1])))
