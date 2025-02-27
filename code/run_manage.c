@@ -40,16 +40,25 @@ int	run_redir(char **params, t_node *start_node, t_node *self)
 int	run_env(char **params, t_node *start_node, t_node *self)
 {
 	t_list	*temp;
+	t_list	*copy;
 
 	(void) self;
 	if (strlist_len(params) != 1)
 		error_exit("Env with too many args\n", start_node, self);
 	temp = start_node->envp;
+	if (!ft_strcmp(params[0], "export"))
+	{
+		temp = dup_env(start_node->envp);
+		ft_sortenv(&temp);
+		copy = temp;
+	}
 	while (temp != NULL)
 	{
 		printf("%s=%s\n", temp->key, temp->val);
 		temp = temp->next;
 	}
+	if (!ft_strcmp(params[0], "export"))
+		remove_link(&copy, copy, NULL);
 	free2d(params);
 	return (0);
 }

@@ -97,6 +97,10 @@ char	*ft_getenv(char *key, t_list *envp);
 
 void	ft_setenv(t_list **envp, char *key, char *val, int overwrite);
 
+t_list	*dup_env(t_list *envp);
+
+void	ft_sortenv(t_list **envp);
+
 ////////////////////  Generic Utils ////////////////////////////////////////
 
 t_node	*function_matching(char *str);
@@ -142,8 +146,6 @@ char	*strnrplc(char *str, char *replace, int start, int len);
 int		strlist_len(char **strlist);
 
 int		word_end(char *word, char *end_set, int print);
-
-void	free_strlist(char **strlist, int index);
 
 ////////////////////  END ///////////////////////////////////////////////
 

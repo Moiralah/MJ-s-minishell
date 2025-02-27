@@ -73,3 +73,42 @@ void	ft_setenv(t_list **envp, char *key, char *val, int overwrite)
 	else
 		node[0]->next = node[1];
 }
+
+t_list	*dup_env(t_list *envp)
+{
+	t_list	*copy;
+
+	copy = NULL;
+	while (envp)
+	{
+		ft_setenv(&copy, envp->key, envp->val, 0);
+		envp = envp->next;
+	}
+	return (copy);
+}
+
+void	ft_sortenv(t_list **envp)
+{
+	t_list	*node[2];
+	char	*temp[2];
+
+	node[0] = *envp;
+	while (node[0])
+	{
+		node[1] = node[0]->next;
+		while (node[1])
+		{
+			if (ft_strcmp(node[0]->key, node[1]->key) > 0)
+			{
+				temp[0] = node[0]->key;
+				temp[1] = node[0]->val;
+				node[0]->key = node[1]->key;
+				node[0]->val = node[1]->val;
+				node[1]->key = temp[0];
+				node[1]->val = temp[1];
+			}
+			node[1] = node[1]->next;
+		}
+		node[0] = node[0]->next;
+	}
+}

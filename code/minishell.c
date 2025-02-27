@@ -31,7 +31,9 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 		if (pid == -1)
 			error_exit(strerror(errno), start, cur);
 		if ((pid == -2) && (cur->run(cur->params, start, cur) == 1))
+		{
 			(free(input), input = strjoin_n_gnl(STDOUT_FILENO));
+		}
 		else if ((pid == 0) && (pipe_handling(&fd, com_amnt)))
 			cur->run(cur->params, start, cur);
 		cur = cur->next;
