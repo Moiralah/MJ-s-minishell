@@ -38,7 +38,7 @@ t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
 	return (cur_node->next);
 }
 
-void	initialising(t_list *envp, char **comms, char *line, int *fd)
+void	initialising(t_list **envp, char **comms, char *line, int *fd)
 {
 	t_node	*nodes[2];
 	int		i;
@@ -46,6 +46,7 @@ void	initialising(t_list *envp, char **comms, char *line, int *fd)
 	i = -1;
 	pipe_handling(&fd, strlist_len(comms));
 	nodes[0] = create_pipe_node(fd, 0, strlist_len(comms));
+	nodes[0]->envp = envp[0];
 	nodes[1] = nodes[0];
 	while (comms[++i] != NULL)
 	{
@@ -54,9 +55,10 @@ void	initialising(t_list *envp, char **comms, char *line, int *fd)
 		nodes[1] = nodes[1]->next;
 	}
 	free(comms);
-	nodes[0]->envp = envp;
+	nodes[0]->envp = envp[0];
 	nodes[1] = nodes[0];
 	executing(nodes[1], fd, i, line);
+	envp[0] = nodes[0]->envp;
 	while (nodes[0] != NULL)
 	{
 		nodes[1] = nodes[0];
@@ -106,7 +108,7 @@ int	main(int argc, char **argv, char **local_envp)
 	{
 		init_signal();
 		input = listening(0, 0);
-		initialising(envp, ft_split(input, '|'), input, NULL);
+		initialising(&envp, ft_split(input, '|'), input, NULL);
 	}
 	while (envp != NULL)
 		remove_link(&envp, envp, NULL);
