@@ -16,18 +16,15 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 {
 	t_node	*cur;
 	pid_t	pid;
-	int		q;
 
-	q = 0;
 	pid = -2;
 	cur = start->next;
 	pipe_handling(&fd, com_amnt);
 	while (cur != NULL)
 	{
-		printf("Begin executing\n");
 		if (!cur->built)
 			pid = fork();
-		q = change_io(fd, com_amnt, q, cur->to_pipe);
+		change_io(cur, pid, fd, com_amnt);
 		if (pid == -1)
 			error_exit(strerror(errno), start, cur);
 		if ((pid == -2) && (cur->run(cur->params, start, cur) == 1))
@@ -62,17 +59,14 @@ void	initialising(t_list **envp, char **comms, char *line)
 	nodes[0] = create_generic_node();
 	nodes[0]->envp = envp[0];
 	nodes[1] = nodes[0];
-	printf("Start linking\n");
 	while (comms[++i] != NULL)
 	{
 		nodes[1] = linking(nodes[0], nodes[1], comms[i]);
-		nodes[1]->to_pipe = 1;
+		nodes[1]->to_pipe = i + 1;
 	}
-	printf("Done linking\n");
 	free(comms);
 	nodes[1] = nodes[0];
 	executing(nodes[1], NULL, i, line);
-	printf("Done executing\n");
 	envp[0] = nodes[0]->envp;
 	while (nodes[0] != NULL)
 	{
