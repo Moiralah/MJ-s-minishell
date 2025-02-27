@@ -31,7 +31,7 @@ char	*expansion(char *str, t_list *envp, int i)
 		var_val = ft_getenv(var_name, envp);
 		free(var_name);
 		if (*var_val == '\0')
-			continue ;
+			var_val = NULL;
 		var_val = ft_strdup(var_val);
 		str = strnrplc(str, var_val, s - str, i);
 		s = ft_strchr(str, '$');
