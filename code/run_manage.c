@@ -12,31 +12,6 @@
 
 #include "minishell.h"
 
-int	run_pipe(char **params, t_node *start_node, t_node *self)
-{
-	int	*fd;
-	int	q;
-	int	l;
-
-	(void) start_node;
-	(void) self;
-	fd = (int *)params[0];
-	q = ft_atoi(params[1]);
-	l = ft_atoi(params[2]);
-	if (q == l)
-		return (-1);
-	if (q == 1)
-		dup2(fd[1], STDOUT_FILENO);
-	else if (q == (l - 1))
-		dup2(fd[(q * 2) - 4], STDIN_FILENO);
-	else
-	{
-		dup2(fd[(q * 2) - 4], STDIN_FILENO);
-		dup2(fd[(q * 2) - 1], STDOUT_FILENO);
-	}
-	return (0);
-}
-
 int	run_redir(char **params, t_node *start_node, t_node *self)
 {
 	int	fd;

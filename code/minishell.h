@@ -39,6 +39,7 @@ typedef struct s_nodes
 	char			**params;
 	int				(*run)(char **p, struct s_nodes *st, struct s_nodes *s);
 	int				built;
+	int				to_pipe;
 	struct s_nodes	*next;
 }	t_node;
 
@@ -102,7 +103,7 @@ t_node	*function_matching(char *str);
 
 char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch);
 
-void	pipe_handling(int **pipe, int len);
+int		pipe_handling(int **pipe, int len);
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev);
 
@@ -116,7 +117,7 @@ char	*find_path(char *params, t_list *envp);
 
 int		legitnum(char *str);
 
-void	run_node(t_node **nodes, char **input, int *fd, int com_amnt);
+int		change_io(int *fd, int com_amnt, int q, int to_pipe);
 
 void	heredoc(char *str);
 

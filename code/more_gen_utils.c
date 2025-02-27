@@ -81,27 +81,24 @@ int	legitnum(char *str)
 	return (1);
 }
 
-void	run_node(t_node **n, char **input, int *fd, int com_amnt)
+int	change_io(int *fd, int com_amnt, int q, int to_pipe)
 {
-	pid_t	pid;
-
-	pid = -2;
-	if (!n[1]->built)
-		pid = fork();
-	if (n[1]->built != 2)
-	{}
-	if (pid == -1)
-		error_exit(strerror(errno), n[0], n[1]);
-	if ((pid == -2) && (n[1]->run(n[1]->params, n[0], n[1]) == 1))
+	if ((!to_pipe) || (com_amnt == 1))
+		return (q);
+	q++;
+	if (q == 1)
 	{
-		free(input[0]);
-		input[0] = strjoin_n_gnl(STDOUT_FILENO);
+		printf("To STDOUT\n");
+		dup2(fd[1], STDOUT_FILENO);
 	}
-	else if (pid == 1)
+	else if (q == com_amnt)
+		dup2(fd[(q * 2) - 4], STDIN_FILENO);
+	else
 	{
-		pipe_handling(&fd, com_amnt);
-		n[1]->run(n[1]->params, n[0], n[1]);
+		dup2(fd[(q * 2) - 4], STDIN_FILENO);
+		dup2(fd[(q * 2) - 1], STDOUT_FILENO);
 	}
+	return (q);
 }
 
 void	heredoc(char *str)
