@@ -117,7 +117,7 @@ int	run_unset(char **params, t_node *start_node, t_node *self)
 		while (list[0] != NULL)
 		{
 			if (!ft_strcmp(list[0]->key, params[i]))
-			//{
+			{
 				remove_link(&start_node->envp, list[0], list[1]);
 				break ;
 			}

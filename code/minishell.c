@@ -17,11 +17,22 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 	t_node	*nodes[2];
 
 	nodes[0] = start;
-	nodes[1] = start;
-	while (nodes[0] != NULL)
+	nodes[1] = start->next;
+	while (nodes[1] != NULL)
 	{
+
+
+
+
+
+
+
+
+
+
+
 		run_node(nodes, &input, fd, com_amnt);
-		nodes[0] = nodes[0]->next;
+		nodes[1] = nodes[1]->next;
 	}
 	pipe_handling(&fd, com_amnt);
 	waitpid(-1, NULL, 0);
@@ -45,17 +56,17 @@ void	initialising(t_list **envp, char **comms, char *line, int *fd)
 
 	i = -1;
 	pipe_handling(&fd, strlist_len(comms));
-	nodes[0] = create_pipe_node(fd, 0, strlist_len(comms));
+	// nodes[0] = create_pipe_node(fd, 0, strlist_len(comms));
+	nodes[0] = create_generic_node();
 	nodes[0]->envp = envp[0];
 	nodes[1] = nodes[0];
 	while (comms[++i] != NULL)
 	{
 		nodes[1] = linking(nodes[0], nodes[1], comms[i]);
-		nodes[1]->next = create_pipe_node(fd, i, strlist_len(comms));
+		// nodes[1]->next = create_pipe_node(fd, i, strlist_len(comms));
 		nodes[1] = nodes[1]->next;
 	}
 	free(comms);
-	nodes[0]->envp = envp[0];
 	nodes[1] = nodes[0];
 	executing(nodes[1], fd, i, line);
 	envp[0] = nodes[0]->envp;

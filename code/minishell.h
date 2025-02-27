@@ -44,6 +44,8 @@ typedef struct s_nodes
 
 //////////////////// Create Node ////////////////////////////////////////
 
+t_node	*create_generic_node(void);
+
 t_node	*create_pipe_node(int *fd, int i, int final);
 
 t_node	*create_cd_node(char **path);

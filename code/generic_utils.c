@@ -85,7 +85,7 @@ void	pipe_handling(int **fd, int len)
 			pipe(fd[0] + (2 * i));
 		return ;
 	}
-	while (++i < len)
+	while (++i < ((len - 1) * 2))
 		close(fd[0][i]);
 }
 

@@ -86,19 +86,21 @@ void	run_node(t_node **n, char **input, int *fd, int com_amnt)
 	pid_t	pid;
 
 	pid = -2;
-	if (!n[0]->built)
+	if (!n[1]->built)
 		pid = fork();
+	if (n[1]->built != 2)
+	{}
 	if (pid == -1)
-		error_exit(strerror(errno), n[1], n[0]);
-	if ((pid == -2) && (n[0]->run(n[0]->params, n[1], n[0]) == 1))
+		error_exit(strerror(errno), n[0], n[1]);
+	if ((pid == -2) && (n[1]->run(n[1]->params, n[0], n[1]) == 1))
 	{
 		free(input[0]);
 		input[0] = strjoin_n_gnl(STDOUT_FILENO);
 	}
-	else if (pid == 0)
+	else if (pid == 1)
 	{
 		pipe_handling(&fd, com_amnt);
-		n[0]->run(n[0]->params, n[1], n[0]);
+		n[1]->run(n[1]->params, n[0], n[1]);
 	}
 }
 
