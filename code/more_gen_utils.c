@@ -31,7 +31,7 @@ char	*expansion(char *str, t_list *envp, int i)
 		var_val = ft_getenv(var_name, envp);
 		free(var_name);
 		if (*var_val == '\0')
-			var_val = NULL;
+			var_val = NULL; 
 		var_val = ft_strdup(var_val);
 		str = strnrplc(str, var_val, s - str, i);
 		s = ft_strchr(str, '$');
@@ -81,24 +81,21 @@ int	legitnum(char *str)
 	return (1);
 }
 
-int	change_io(int *fd, int com_amnt, int q, int to_pipe)
+void	change_io(t_node *cur, pid_t pid, int *fd, int com_amnt)
 {
-	if ((!to_pipe) || (com_amnt == 1))
-		return (q);
-	q++;
-	if (q == 1)
-	{
-		printf("To STDOUT\n");
+	if ((!cur->to_pipe) || (com_amnt == 1))
+		return ;
+	if (pid > 0)
+		return ; 
+	if (cur->to_pipe == 1)
 		dup2(fd[1], STDOUT_FILENO);
-	}
-	else if (q == com_amnt)
-		dup2(fd[(q * 2) - 4], STDIN_FILENO);
+	else if (cur->to_pipe == com_amnt)
+		dup2(fd[(cur->to_pipe * 2) - 4], STDIN_FILENO);
 	else
 	{
-		dup2(fd[(q * 2) - 4], STDIN_FILENO);
-		dup2(fd[(q * 2) - 1], STDOUT_FILENO);
+		dup2(fd[(cur->to_pipe * 2) - 4], STDIN_FILENO);
+		dup2(fd[(cur->to_pipe * 2) - 1], STDOUT_FILENO);
 	}
-	return (q);
 }
 
 void	heredoc(char *str)

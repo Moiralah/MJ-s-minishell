@@ -49,13 +49,14 @@ int	run_echo(char **params, t_node *start_node, t_node *self)
 	i = 1;
 	while (params[i] && (ft_strncmp(params[i], "-n", 2) == 0))
 		i++;
-	while (params[i + 1])
+	while ((params[i]) && (params[i + 1]))
 	{
 		printf("%s ", params[i]);
 		i++;
 	}
-	printf("%s", params[i]);
-	if (ft_strncmp(params[1], "-n", 2) != 0)
+	if (params[i])
+		printf("%s", params[i]);
+	if (ft_strcmp(params[1], "-n") != 0)
 		printf("\n");
 	free2d(params);
 	return (0);
