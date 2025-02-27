@@ -1,0 +1,7 @@
+code
+libft
+Makefile
+minishell
+notes
+obj
+output.txt

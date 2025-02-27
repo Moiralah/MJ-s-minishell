@@ -57,10 +57,16 @@ void	sigint_handler(int signo)
 	rl_redisplay();
 }
 
-void	sigquit_handler(int signo)
+void	signal_ignore(void)
 {
-	(void)signo;
-	write(1, "Quit: 3\n", 8);
+	struct sigaction	sa;
+
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SIG_IGN;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
 }
 
 void	init_signal(void)

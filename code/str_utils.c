@@ -75,18 +75,3 @@ int	word_end(char *word, char *end_set, int print)
 	}
 	return (i);
 }
-
-void	free_strlist(char **strlist, int index)
-{
-	int	i;
-
-	i = -1;
-	while (strlist[++i] != NULL)
-	{
-		if (i == index)
-			break ;
-		free(strlist[i]);
-	}
-	if (index < 0)
-		free(strlist);
-}

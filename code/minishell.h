@@ -122,9 +122,11 @@ void	heredoc(char *str);
 
 ////////////////////  Signal Utils ////////////////////////////////////////
 
+void	disable_echoctl(void);
+
 void	sigint_handler(int signo);
 
-void	sigquit_handler(int signo);
+void	signal_ignore(void);
 
 void	init_signal(void);
 
