@@ -66,13 +66,13 @@ char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
 	return (comm);
 }
 
-void	pipe_handling(int **fd, int len)
+int	pipe_handling(int **fd, int len)
 {
 	int	i;
 
 	i = -1;
 	if (len == 0)
-		return ;
+		return (-1);
 	if (fd[0] == NULL)
 	{
 		if (len <= 1)
@@ -83,10 +83,11 @@ void	pipe_handling(int **fd, int len)
 			len = 2;
 		while (++i < (len - 1))
 			pipe(fd[0] + (2 * i));
-		return ;
+		return (0);
 	}
 	while (++i < ((len - 1) * 2))
 		close(fd[0][i]);
+	return (1);
 }
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev)

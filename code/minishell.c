@@ -14,25 +14,27 @@
 
 void	executing(t_node *start, int *fd, int com_amnt, char *input)
 {
-	t_node	*nodes[2];
+	t_node	*cur;
+	pid_t	pid;
+	int		q;
 
-	nodes[0] = start;
-	nodes[1] = start->next;
-	while (nodes[1] != NULL)
+	q = 0;
+	pid = -2;
+	cur = start->next;
+	pipe_handling(&fd, com_amnt);
+	while (cur != NULL)
 	{
-
-
-
-
-
-
-
-
-
-
-
-		run_node(nodes, &input, fd, com_amnt);
-		nodes[1] = nodes[1]->next;
+		printf("Begin executing\n");
+		if (!cur->built)
+			pid = fork();
+		q = change_io(fd, com_amnt, q, cur->to_pipe);
+		if (pid == -1)
+			error_exit(strerror(errno), start, cur);
+		if ((pid == -2) && (cur->run(cur->params, start, cur) == 1))
+			(free(input), input = strjoin_n_gnl(STDOUT_FILENO));
+		else if ((pid == 0) && (pipe_handling(&fd, com_amnt)))
+			cur->run(cur->params, start, cur);
+		cur = cur->next;
 	}
 	pipe_handling(&fd, com_amnt);
 	waitpid(-1, NULL, 0);
@@ -49,26 +51,26 @@ t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
 	return (cur_node->next);
 }
 
-void	initialising(t_list **envp, char **comms, char *line, int *fd)
+void	initialising(t_list **envp, char **comms, char *line)
 {
 	t_node	*nodes[2];
 	int		i;
 
 	i = -1;
-	pipe_handling(&fd, strlist_len(comms));
-	// nodes[0] = create_pipe_node(fd, 0, strlist_len(comms));
 	nodes[0] = create_generic_node();
 	nodes[0]->envp = envp[0];
 	nodes[1] = nodes[0];
+	printf("Start linking\n");
 	while (comms[++i] != NULL)
 	{
 		nodes[1] = linking(nodes[0], nodes[1], comms[i]);
-		// nodes[1]->next = create_pipe_node(fd, i, strlist_len(comms));
-		nodes[1] = nodes[1]->next;
+		nodes[1]->to_pipe = 1;
 	}
+	printf("Done linking\n");
 	free(comms);
 	nodes[1] = nodes[0];
-	executing(nodes[1], fd, i, line);
+	executing(nodes[1], NULL, i, line);
+	printf("Done executing\n");
 	envp[0] = nodes[0]->envp;
 	while (nodes[0] != NULL)
 	{
@@ -119,7 +121,7 @@ int	main(int argc, char **argv, char **local_envp)
 	{
 		init_signal();
 		input = listening(0, 0);
-		initialising(&envp, ft_split(input, '|'), input, NULL);
+		initialising(&envp, ft_split(input, '|'), input);
 	}
 	while (envp != NULL)
 		remove_link(&envp, envp, NULL);
