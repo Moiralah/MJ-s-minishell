@@ -31,7 +31,7 @@ char	*expansion(char *str, t_list *envp, int i)
 		var_val = ft_getenv(var_name, envp);
 		free(var_name);
 		if (*var_val == '\0')
-			var_val = NULL; 
+			var_val = NULL;
 		var_val = ft_strdup(var_val);
 		str = strnrplc(str, var_val, s - str, i);
 		s = ft_strchr(str, '$');
@@ -81,12 +81,17 @@ int	legitnum(char *str)
 	return (1);
 }
 
-void	change_io(t_node *cur, pid_t pid, int *fd, int com_amnt)
+void	change_io(t_node *cur, pid_t pid, int *fd, int com_amnt, int *ori, int fix)
 {
+	if (fix)
+	{
+		dup2(ori[1], STDOUT_FILENO);
+		dup2(ori[0], STDIN_FILENO);
+	}
 	if ((!cur->to_pipe) || (com_amnt == 1))
 		return ;
 	if (pid > 0)
-		return ; 
+		return ;
 	if (cur->to_pipe == 1)
 		dup2(fd[1], STDOUT_FILENO);
 	else if (cur->to_pipe == com_amnt)

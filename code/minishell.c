@@ -19,19 +19,29 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 
 	pid = -2;
 	cur = start->next;
+	int	original[2];
+	original[0] = dup(STDIN_FILENO);
+	original[1] = dup(STDOUT_FILENO);
 	pipe_handling(&fd, com_amnt);
 	while (cur != NULL)
 	{
+		pid = -2;
 		if (!cur->built)
 			pid = fork();
-		change_io(cur, pid, fd, com_amnt);
+		change_io(cur, pid, fd, com_amnt, NULL, 0);
 		if (pid == -1)
 			error_exit(strerror(errno), start, cur);
-		if ((pid == -2) && (cur->run(cur->params, start, cur) == 1))
-			(free(input), input = strjoin_n_gnl(STDOUT_FILENO));
+		if (pid == -2)
+		{
+			if (cur->run(cur->params, start, cur) == 1)
+				(free(input), input = strjoin_n_gnl(STDOUT_FILENO));
+			change_io(cur, pid, fd, com_amnt, original, 1);
+		}
 		else if ((pid == 0) && (pipe_handling(&fd, com_amnt)))
 		{
 			restore_signal();
+			close(original[0]);
+			close(original[1]);
 			cur->run(cur->params, start, cur);
 		}
 		else
@@ -39,7 +49,12 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 		cur = cur->next;
 	}
 	pipe_handling(&fd, com_amnt);
-	waitpid(-1, NULL, 0);
+	dup2(original[0], STDIN_FILENO);
+	dup2(original[1], STDOUT_FILENO);
+	close(original[0]);
+	close(original[1]);
+	while (waitpid(-1, NULL, 0) != -1)
+		;
 	add_history(input);
 	free(input);
 }

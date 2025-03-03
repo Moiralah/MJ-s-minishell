@@ -85,8 +85,18 @@ int	pipe_handling(int **fd, int len)
 			pipe(fd[0] + (2 * i));
 		return (0);
 	}
+	if ((len - 1) == 0)
+	{
+		close(fd[0][0]);
+		close(fd[0][1]);
+		free(*fd);
+		return (1);
+	}
 	while (++i < ((len - 1) * 2))
+	{
 		close(fd[0][i]);
+	}
+	free(*fd);
 	return (1);
 }
 

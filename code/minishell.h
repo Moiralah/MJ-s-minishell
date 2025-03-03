@@ -121,7 +121,7 @@ char	*find_path(char *params, t_list *envp);
 
 int		legitnum(char *str);
 
-void	change_io(t_node *cur, pid_t pid, int *fd, int com_amnt);
+void	change_io(t_node *cur, pid_t pid, int *fd, int com_amnt, int *ori, int fix);
 
 void	heredoc(char *str);
 

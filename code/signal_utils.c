@@ -61,7 +61,7 @@ void	signal_ignore(void)
 {
 	struct sigaction	sa;
 
-	memset(&sa, 0, sizeof(sa));
+	ft_memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = SIG_IGN;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
@@ -87,3 +87,29 @@ void	restore_signal(void)
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 }
+
+// void enable_echoctl(void)
+// {
+//     struct termios term;
+
+//     if (tcgetattr(STDIN_FILENO, &term) == -1)
+//         return;  // Error handling: don't modify terminal settings if we can't retrieve them
+
+//     term.c_lflag = printf("\n");  // Re-enable ^C printing for executed commands
+//     tcsetattr(STDIN_FILENO, TCSANOW, &term);  // Apply changes immediately
+// }
+
+// void restore_signal(void)
+// {
+//     struct sigaction sa;
+
+//     // Restore SIGINT (Ctrl+C) and SIGQUIT (Ctrl+\) to default
+//     sa.sa_handler = SIG_DFL;
+//     sigemptyset(&sa.sa_mask);
+//     sa.sa_flags = 0;
+//     sigaction(SIGINT, &sa, NULL);
+//     sigaction(SIGQUIT, &sa, NULL);
+
+//     // Re-enable ^C and other control character printing
+//     enable_echoctl();
+// }
