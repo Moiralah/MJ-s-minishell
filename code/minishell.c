@@ -26,6 +26,7 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 	while (cur != NULL)
 	{
 		pid = -2;
+		printf("Begin executing\n");
 		if (!cur->built)
 			pid = fork();
 		change_io(cur, pid, fd, com_amnt, NULL, 0);
@@ -62,10 +63,14 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
 {
 	comm = expansion(comm, start_node->envp, 0);
-	comm = fnames_to_nodes(&cur_node, comm, '<');
-	comm = fnames_to_nodes(&cur_node, comm, '>');
+	comm = fnames_to_nodes(&cur_node, comm, '<', 0);
+	printf("Comm 1: %s\n", comm);
+	comm = fnames_to_nodes(&cur_node, comm, '>', 0);
+	printf("Comm 2: %s\n", comm);
 	cur_node->next = function_matching(comm);
-	return (cur_node->next);
+	if (cur_node->next)
+		return (cur_node->next);
+	return (cur_node);
 }
 
 void	initialising(t_list **envp, char **comms, char *line)
@@ -101,6 +106,8 @@ char	*listening(int i, int q)
 {
 	char	*line;
 
+	/* rl_on_new_line();
+	rl_replace_line("", 1); */
 	line = readline("MJ > ");
 	if (line == NULL)
 	{

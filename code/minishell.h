@@ -105,7 +105,7 @@ void	ft_sortenv(t_list **envp);
 
 t_node	*function_matching(char *str);
 
-char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch);
+char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch, int i);
 
 int		pipe_handling(int **pipe, int len);
 

@@ -32,8 +32,11 @@ char	*strnrplc(char *str, char *replace, int start, int len)
 	char	*before;
 	char	*after;
 
+	printf("Start: %d | Len: %d\n", start, len);
 	before = ft_substr(str, 0, start);
 	after = ft_substr(str, start + len + 1, ft_strlen(str) - start - len);
+	printf("Before: %s\n", before);
+	printf("After: %s\n", after);
 	if (replace)
 	{
 		free(str);
@@ -60,17 +63,21 @@ int	word_end(char *word, char *end_set, int print)
 	int	q;
 
 	i = -1;
-	q = 0;
 	if (word[++i] == '"')
 		return (ft_strchr(word, '"') - word);
+	printf(" | [%c]\n", word[i]);
 	while (word[i] != '\0')
 	{
+		q = 0;
 		if (print && (!ft_isprint(word[i])))
 			return (i);
 		while ((end_set[q] != '\0') && (end_set[q] != word[i]))
 			q++;
 		if (end_set[q] == word[i])
+		{
+			printf("|%c| [%d | %d]\n", word[i], i, q);
 			return (i);
+		}
 		i++;
 	}
 	return (i);

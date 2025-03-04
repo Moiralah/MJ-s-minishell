@@ -34,33 +34,39 @@ t_node	*function_matching(char *str)
 		return (create_env_node(comm_n_flags));
 	else if (!ft_strcmp("exit", comm_n_flags[0]))
 		return (create_exit_node(comm_n_flags));
+	printf("EXECVE\n");
 	return (create_exec_node(comm_n_flags));
 }
 
-char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
+char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch, int i)
 {
 	char	*fname;
 	char	*start;
 	int		word_s;
-	int		i;
 
-	i = 0;
 	word_s = 0;
 	start = ft_strchr(comm, ch);
 	while ((start) && (start[++i] != '\0'))
 	{
 		if (word_s)
 		{
+			printf("Word_S: %d\n", word_s);
+			printf("Start: |%s|", start + word_s);
 			i = word_end(start + word_s, " <>", 1);
-			fname = ft_substr(start, word_s, i - word_s);
+			printf("Len: %d\n", i - word_s);
+			fname = ft_substr(start, word_s, i);
+			printf("Filename: %s\n", fname);
 			if (start[0] == start[1])
 				cur_node[0]->next = create_redir_node(ch + 1, fname);
 			else
 				cur_node[0]->next = create_redir_node(ch, fname);
 			cur_node[0] = cur_node[0]->next;
-			comm = strnrplc(comm, NULL, comm - start, i - word_s);
+			printf("Make: %s | %s\n", cur_node[0]->params[0], cur_node[0]->params[1]);
+			comm = strnrplc(comm, NULL, start - comm, i + word_s);
+			word_s = 0;
+			i = 0;
 		}
-		else if (ft_isprint(start[i]) || (start[i] != ' ') || (start[i] != ch))
+		else if (ft_isprint(start[i]) && (start[i] != ' ') && (start[i] != ch))
 			word_s = i;
 	}
 	return (comm);

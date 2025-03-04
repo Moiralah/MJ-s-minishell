@@ -26,12 +26,18 @@ int	run_redir(char **params, t_node *start_node, t_node *self)
 		fd = open(params[1], O_CREAT | O_WRONLY | O_APPEND, 0666);
 	if (fd == -1)
 		error_exit(strerror(errno), start_node, self);
+	printf("Opened file\n");
 	if (params[0][0] == '<')
 		dup2(fd, STDIN_FILENO);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
+	{
+		printf("Dupping %d to STDOUT\n", fd);
 		dup2(fd, STDOUT_FILENO);
+		printf("Finish dupping %d to STDOUT\n", fd);
+	}
 	else
 		dup2(STDIN_FILENO, STDIN_FILENO);
+	printf("Done redir\n");
 	if (params[0][0] != '=')
 		return (free2d(params), close(fd), 0);
 	return (free2d(params), 1);
