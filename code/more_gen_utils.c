@@ -12,28 +12,31 @@
 
 #include "minishell.h"
 
+// var[0] = var_name
+// var[1] = var_value
 char	*expansion(char *str, t_list *envp, int i)
 {
 	char	*s;
-	char	*var_name;
-	char	*var_val;
+	char	*var[2];
 
 	s = ft_strchr(str, '$');
+	if (ft_strchr(--s, 39) != NULL)
+		return (str);
 	while ((s) && (s[++i] != '\0'))
 	{
-		var_name = NULL;
+		var[0] = NULL;
 		if (s[i] == '?')
 			printf("Exit Status Code: 1\n");
 		else if ((s[i + 1] == ' ') || (s[i + 1] == '$') || (s[i + 1] == '\0'))
-			var_name = ft_substr(s, 1, i);
-		if (!var_name)
+			var[0] = ft_substr(s, 1, i);
+		if (!var[0])
 			continue ;
-		var_val = ft_getenv(var_name, envp);
-		free(var_name);
-		if (*var_val == '\0')
-			var_val = NULL;
-		var_val = ft_strdup(var_val);
-		str = strnrplc(str, var_val, s - str, i);
+		var[1] = ft_getenv(var[0], envp);
+		free(var[0]);
+		if (*var[1] == '\0')
+			var[1] = NULL;
+		var[1] = ft_strdup(var[1]);
+		str = strnrplc(str, var[1], s - str, i);
 		s = ft_strchr(str, '$');
 		i = 0;
 	}
