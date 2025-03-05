@@ -20,7 +20,7 @@ char	*expansion(char *str, t_list *envp, int i)
 	char	*var[2];
 
 	s = ft_strchr(str, '$');
-	if (ft_strchr(s, 39) != NULL)
+	if (s && ft_strchr(s, 39) != NULL)
 		return (str);
 	while ((s) && (s[++i] != '\0'))
 	{
@@ -38,7 +38,7 @@ char	*expansion(char *str, t_list *envp, int i)
 		var[1] = ft_strdup(var[1]);
 		str = strnrplc(str, var[1], s - str, i);
 		s = ft_strchr(str, '$');
-		i = 0;
+		i = -1;
 	}
 	return (str);
 }
