@@ -57,6 +57,7 @@ files 	   = ft_strlen \
 			 ft_strjoingnl \
 			 get_next_line \
 			 free2d \
+			 ft_splitmj
 
 Compiler	= gcc
 

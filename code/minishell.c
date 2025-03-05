@@ -74,6 +74,9 @@ void	initialising(t_list **envp, char **comms, char *line)
 	int		i;
 
 	i = -1;
+	while(comms[++i] != NULL)
+		printf("comms: %s\n", comms[i]);
+	i = -1;
 	nodes[0] = create_generic_node();
 	nodes[0]->envp = envp[0];
 	nodes[1] = nodes[0];
@@ -140,7 +143,7 @@ int	main(int argc, char **argv, char **local_envp)
 	{
 		init_signal();
 		input = listening(0, 0);
-		initialising(&envp, ft_split(input, '|'), input);
+		initialising(&envp, ft_splitmj(input, '|'), input);
 	}
 	while (envp != NULL)
 		remove_link(&envp, envp, NULL);
