@@ -17,45 +17,33 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 	t_node	*cur;
 	pid_t	pid;
 
-	pid = -2;
 	cur = start->next;
-	int	original[2];
-	original[0] = dup(STDIN_FILENO);
-	original[1] = dup(STDOUT_FILENO);
-	pipe_handling(&fd, com_amnt);
+	pipe_handling(start, &fd, com_amnt);
 	while (cur != NULL)
 	{
 		pid = -2;
-		printf("Begin executing\n");
 		if (!cur->built)
 			pid = fork();
-		change_io(cur, pid, fd, com_amnt, NULL, 0);
+		change_io(start, cur, pid, fd, com_amnt);
 		if (pid == -1)
 			error_exit(strerror(errno), start, cur);
-		if (pid == -2)
+		if ((pid == -2) && (cur->run(cur->params, start, cur) == 1))
 		{
-			if (cur->run(cur->params, start, cur) == 1)
-				(free(input), input = strjoin_n_gnl(STDOUT_FILENO));
-			change_io(cur, pid, fd, com_amnt, original, 1);
+			// free(input);
+			// input = strjoin_n_gnl(STDOUT_FILENO);
 		}
-		else if ((pid == 0) && (pipe_handling(&fd, com_amnt)))
-		{
-			restore_signal();
-			close(original[0]);
-			close(original[1]);
-			cur->run(cur->params, start, cur);
-		}
-		else
+		else if ((pid == 0) && pipe_handling(start, &fd, com_amnt))
+			(restore_signal(), cur->run(cur->params, start, cur));
+		if (pid > 0)
 			signal_ignore();
 		cur = cur->next;
 	}
-	pipe_handling(&fd, com_amnt);
-	dup2(original[0], STDIN_FILENO);
-	dup2(original[1], STDOUT_FILENO);
-	close(original[0]);
-	close(original[1]);
-	while (waitpid(-1, NULL, 0) != -1)
-		;
+	pipe_handling(start, &fd, com_amnt);
+	close(start->ori_fd[0]);
+	close(start->ori_fd[1]);
+	int	i = 0;
+	while (i != -1)
+		i = waitpid(-1, NULL, 0);
 	add_history(input);
 	free(input);
 }
@@ -63,10 +51,10 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
 {
 	comm = expansion(comm, start_node->envp, 0);
-	comm = fnames_to_nodes(&cur_node, comm, '<', 0);
-	printf("Comm 1: %s\n", comm);
-	comm = fnames_to_nodes(&cur_node, comm, '>', 0);
-	printf("Comm 2: %s\n", comm);
+	comm = fnames_to_nodes(&cur_node, comm, '<');
+	// printf("Comm 1: %s\n", comm);
+	comm = fnames_to_nodes(&cur_node, comm, '>');
+	// printf("Comm 2: %s\n", comm);
 	cur_node->next = function_matching(comm);
 	if (cur_node->next)
 		return (cur_node->next);
@@ -79,11 +67,7 @@ void	initialising(t_list **envp, char **comms, char *line)
 	int		i;
 
 	i = -1;
-	while(comms[++i] != NULL)
-		printf("comms: %s\n", comms[i]);
-	i = -1;
-	nodes[0] = create_generic_node();
-	nodes[0]->envp = envp[0];
+	nodes[0] = create_generic_node(envp[0]);
 	nodes[1] = nodes[0];
 	while (comms[++i] != NULL)
 	{
@@ -106,14 +90,9 @@ char	*listening(int i, int q)
 {
 	char	*line;
 
-	/* rl_on_new_line();
-	rl_replace_line("", 1); */
 	line = readline("MJ > ");
 	if (line == NULL)
-	{
-		printf("exit\n");
-		exit(0);
-	}
+		(printf("ERxit\n"), exit(0));
 	while (line[i] != '\0')
 	{
 		q = 0;

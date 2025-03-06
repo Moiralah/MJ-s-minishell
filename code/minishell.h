@@ -38,6 +38,7 @@ typedef struct s_nodes
 	t_list			*envp;
 	char			**params;
 	int				(*run)(char **p, struct s_nodes *st, struct s_nodes *s);
+	int			*ori_fd;
 	int				built;
 	int				to_pipe;
 	struct s_nodes	*next;
@@ -45,7 +46,7 @@ typedef struct s_nodes
 
 //////////////////// Create Node ////////////////////////////////////////
 
-t_node	*create_generic_node(void);
+t_node	*create_generic_node(t_list *envp);
 
 t_node	*create_pipe_node(int *fd, int i, int final);
 
@@ -105,9 +106,9 @@ void	ft_sortenv(t_list **envp);
 
 t_node	*function_matching(char *str);
 
-char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch, int i);
+char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch);
 
-int		pipe_handling(int **pipe, int len);
+int		pipe_handling(t_node *start, int **pipe, int len);
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev);
 
@@ -121,7 +122,7 @@ char	*find_path(char *params, t_list *envp);
 
 int		legitnum(char *str);
 
-void	change_io(t_node *cur, pid_t pid, int *fd, int com_amnt, int *ori, int fix);
+void	change_io(t_node *start, t_node *cur, pid_t pid, int *fd, int com_amnt);
 
 void	heredoc(char *str);
 
@@ -143,9 +144,14 @@ char	*strjoin_n_gnl(int fd);
 
 char	*strnrplc(char *str, char *replace, int start, int len);
 
+int		fname_len(char *word, char *ig_set);
+
 int		strlist_len(char **strlist);
 
-int		word_end(char *word, char *end_set, int print);
+
+///// TEMP /////
+
+void	run_node(t_node **n, char **input, int *fd, int com_amnt);
 
 ////////////////////  END ///////////////////////////////////////////////
 

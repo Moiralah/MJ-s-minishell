@@ -34,74 +34,54 @@ t_node	*function_matching(char *str)
 		return (create_env_node(comm_n_flags));
 	else if (!ft_strcmp("exit", comm_n_flags[0]))
 		return (create_exit_node(comm_n_flags));
-	printf("EXECVE\n");
 	return (create_exec_node(comm_n_flags));
 }
 
-char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch, int i)
+char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
 {
 	char	*fname;
-	char	*start;
-	int		word_s;
+	int		i;
 
-	word_s = 0;
-	start = ft_strchr(comm, ch);
-	while ((start) && (start[++i] != '\0'))
+	i = -1;
+	while (comm[++i] != '\0')
 	{
-		if (word_s)
-		{
-			printf("Word_S: %d\n", word_s);
-			printf("Start: |%s|", start + word_s);
-			i = word_end(start + word_s, " <>", 1);
-			printf("Len: %d\n", i - word_s);
-			fname = ft_substr(start, word_s, i);
-			printf("Filename: %s\n", fname);
-			if (start[0] == start[1])
-				cur_node[0]->next = create_redir_node(ch + 1, fname);
-			else
-				cur_node[0]->next = create_redir_node(ch, fname);
-			cur_node[0] = cur_node[0]->next;
-			printf("Make: %s | %s\n", cur_node[0]->params[0], cur_node[0]->params[1]);
-			comm = strnrplc(comm, NULL, start - comm, i + word_s);
-			word_s = 0;
-			i = 0;
-		}
-		else if (ft_isprint(start[i]) && (start[i] != ' ') && (start[i] != ch))
-			word_s = i;
+		if (comm[i] == '"')
+			i = ft_strchr(comm + i + 1, '"') - comm;
+		else if (comm[i] == 39)
+			i = ft_strchr(comm + i + 1, 39) - comm;
+		if (comm[i] != ch)
+			continue;
+		fname = ft_substr(comm, i, fname_len(comm + i, " <>"));
+		// printf("Fname: |%s|\n", fname);
+		if (comm[i + 1] == ch)
+			cur_node[0]->next = create_redir_node(ch + 1, fname);
+		else
+			cur_node[0]->next = create_redir_node(ch, fname);
+		cur_node[0] = cur_node[0]->next;
+		comm = strnrplc(comm, NULL, i, ft_strlen(fname));
+		i = 0;
 	}
 	return (comm);
 }
 
-int	pipe_handling(int **fd, int len)
+int	pipe_handling(t_node *start, int **fd, int len)
 {
 	int	i;
 
 	i = -1;
-	if (len == 0)
+	if (len <= 0)
 		return (-1);
 	if (fd[0] == NULL)
 	{
-		if (len <= 1)
-			fd[0] = ft_calloc(2, sizeof(int));
-		else
-			fd[0] = ft_calloc((len - 1) * 2, sizeof(int));
-		if (len <= 1)
-			len = 2;
+		fd[0] = ft_calloc((len - 1) * 2, sizeof(int));
 		while (++i < (len - 1))
 			pipe(fd[0] + (2 * i));
 		return (0);
 	}
-	if ((len - 1) == 0)
-	{
-		close(fd[0][0]);
-		close(fd[0][1]);
-		free(*fd);
-		return (1);
-	}
 	while (++i < ((len - 1) * 2))
-	{
 		close(fd[0][i]);
-	}
+	close(start->ori_fd[0]);
+	close(start->ori_fd[1]);
 	free(*fd);
 	return (1);
 }

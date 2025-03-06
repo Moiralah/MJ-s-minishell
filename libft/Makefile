@@ -28,6 +28,7 @@ files 	   = ft_strlen \
 			 ft_tolower \
 			 ft_strchr \
 			 ft_strrchr \
+			 ft_strcmp \
 			 ft_strncmp \
 			 ft_memchr \
 			 ft_memcmp \

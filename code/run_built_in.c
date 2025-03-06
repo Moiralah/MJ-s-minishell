@@ -85,7 +85,10 @@ int	run_export(char **params, t_node *start_node, t_node *self)
 
 	i = 0;
 	if (!params[1])
+	{
+		printf("\nSpecial\n");
 		return (run_env(params, start_node, self), 0);
+	}
 	while (params[++i])
 	{
 		if (!ft_strchr(params[i], '='))

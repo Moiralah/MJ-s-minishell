@@ -32,11 +32,11 @@ char	*strnrplc(char *str, char *replace, int start, int len)
 	char	*before;
 	char	*after;
 
-	printf("Start: %d | Len: %d\n", start, len);
+	// printf("Start: %d | Len: %d\n", start, len);
 	before = ft_substr(str, 0, start);
 	after = ft_substr(str, start + len + 1, ft_strlen(str) - start - len);
-	printf("Before: %s\n", before);
-	printf("After: %s\n", after);
+	/* printf("Before: %s\n", before);
+	printf("After: %s\n", after); */
 	if (replace)
 	{
 		free(str);
@@ -57,28 +57,29 @@ int	strlist_len(char **strlist)
 	return (i);
 }
 
-int	word_end(char *word, char *end_set, int print)
+int	fname_len(char *word, char *ig_set)
 {
-	int	i;
-	int	q;
+	int	n[4];
 
-	i = -1;
-	if (word[++i] == '"')
-		return (ft_strchr(word, '"') - word);
-	printf(" | [%c]\n", word[i]);
-	while (word[i] != '\0')
+	n[0] = -1;
+	n[2] = 0;
+	n[3] = 0;
+	while ((word[++n[0]] != '\0') && (!(n[2] && n[3])))
 	{
-		q = 0;
-		if (print && (!ft_isprint(word[i])))
-			return (i);
-		while ((end_set[q] != '\0') && (end_set[q] != word[i]))
-			q++;
-		if (end_set[q] == word[i])
-		{
-			printf("|%c| [%d | %d]\n", word[i], i, q);
-			return (i);
-		}
-		i++;
+		n[1] = 0;
+		if (word[n[0]] == '"')
+			n[0] = ft_strchr(word + n[0] + 1, '"') - word;
+		else if (word[n[0]] == 39)
+			n[0] = ft_strchr(word + n[0] + 1, 39) - word;
+		n[1] = 0;
+		while ((ig_set[n[1]] != '\0') && (ig_set[n[1]] != word[n[0]]))
+			n[1]++;
+		if (!n[2] && (ig_set[n[1]] == '\0'))
+			n[2] = n[0];
+		if (n[2] && (ig_set[n[1]] != '\0'))
+			n[3] = n[0];
 	}
-	return (i);
+	if (!n[3])
+		n[3] = n[0];
+	return (n[3]);
 }

@@ -38,7 +38,7 @@ char	*ft_getenv(char *key, t_list *envp)
 	temp = envp;
 	while (temp)
 	{
-		if (ft_strcmp(temp->key, key) == 0)
+		if (!ft_strcmp(temp->key, key))
 			return (temp->val);
 		temp = temp->next;
 	}
@@ -52,7 +52,7 @@ void	ft_setenv(t_list **envp, char *key, char *val, int overwrite)
 	node[0] = *envp;
 	while (node[0])
 	{
-		if (ft_strcmp(node[0]->key, key) == 0)
+		if (!ft_strcmp(node[0]->key, key))
 		{
 			if (overwrite)
 				free(node[0]->val);

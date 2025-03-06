@@ -16,12 +16,13 @@ t_node	*create_cd_node(char **path)
 {
 	t_node	*new_node;
 	char	*trimmed;
-	char	to_trim[2];
+	char	to_trim[3];
 	int		i;
 
 	i = -1;
 	to_trim[0] = '"';
-	to_trim[1] = '\0';
+	to_trim[1] = 39;
+	to_trim[2] = '\0';
 	while (path[++i] != NULL)
 	{
 		trimmed = ft_strtrim(path[i], to_trim);
@@ -32,6 +33,7 @@ t_node	*create_cd_node(char **path)
 	new_node->envp = NULL;
 	new_node->params = path;
 	new_node->run = run_cd;
+	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
@@ -42,12 +44,13 @@ t_node	*create_echo_node(char **to_print)
 {
 	t_node	*new_node;
 	char	*trimmed;
-	char	to_trim[2];
+	char	to_trim[3];
 	int		i;
 
 	i = -1;
 	to_trim[0] = '"';
-	to_trim[1] = '\0';
+	to_trim[1] = 39;
+	to_trim[2] = '\0';
 	while (to_print[++i] != NULL)
 	{
 		trimmed = ft_strtrim(to_print[i], to_trim);
@@ -58,6 +61,7 @@ t_node	*create_echo_node(char **to_print)
 	new_node->envp = NULL;
 	new_node->params = to_print;
 	new_node->run = run_echo;
+	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
@@ -72,6 +76,7 @@ t_node	*create_pwd_node(char **params_to_verify)
 	new_node->envp = NULL;
 	new_node->params = params_to_verify;
 	new_node->run = run_pwd;
+	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
@@ -82,12 +87,13 @@ t_node	*create_export_node(char **to_set)
 {
 	t_node	*new_node;
 	char	*trimmed;
-	char	to_trim[2];
+	char	to_trim[3];
 	int		i;
 
 	i = -1;
 	to_trim[0] = '"';
-	to_trim[1] = '\0';
+	to_trim[1] = 39;
+	to_trim[2] = '\0';
 	while (to_set[++i] != NULL)
 	{
 		trimmed = ft_strtrim(to_set[i], to_trim);
@@ -98,6 +104,7 @@ t_node	*create_export_node(char **to_set)
 	new_node->envp = NULL;
 	new_node->params = to_set;
 	new_node->run = run_export;
+	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
@@ -108,12 +115,13 @@ t_node	*create_unset_node(char **to_unset)
 {
 	t_node	*new_node;
 	char	*trimmed;
-	char	to_trim[2];
+	char	to_trim[3];
 	int		i;
 
 	i = -1;
 	to_trim[0] = '"';
-	to_trim[1] = '\0';
+	to_trim[1] = 39;
+	to_trim[2] = '\0';
 	while (to_unset[++i] != NULL)
 	{
 		trimmed = ft_strtrim(to_unset[i], to_trim);
@@ -124,6 +132,7 @@ t_node	*create_unset_node(char **to_unset)
 	new_node->envp = NULL;
 	new_node->params = to_unset;
 	new_node->run = run_unset;
+	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
