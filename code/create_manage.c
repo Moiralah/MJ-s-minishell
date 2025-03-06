@@ -15,8 +15,9 @@
 t_node	*create_generic_node(t_list *envp)
 {
 	t_node	*new_node;
-	int	fd[2];
+	int	*fd;
 
+	fd = ft_calloc(2, sizeof(int));
 	fd[0] = dup(STDIN_FILENO);
 	fd[1] = dup(STDOUT_FILENO);
 	new_node = ft_calloc(1, sizeof(t_node));
@@ -26,6 +27,7 @@ t_node	*create_generic_node(t_list *envp)
 	new_node->ori_fd = fd;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
+	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -54,6 +56,7 @@ t_node	*create_exec_node(char **comm_n_flags)
 	new_node->ori_fd = NULL;
 	new_node->built = 0;
 	new_node->to_pipe = 0;
+	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -82,6 +85,7 @@ t_node	*create_exit_node(char **code)
 	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
+	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -97,6 +101,7 @@ t_node	*create_env_node(char **var)
 	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
+	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -123,6 +128,7 @@ t_node	*create_redir_node(char ch, char *filename)
 	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
+	new_node->exit = 0;
 	new_node->next = NULL;
 	free (filename);
 	return (new_node);

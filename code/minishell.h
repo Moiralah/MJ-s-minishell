@@ -41,6 +41,7 @@ typedef struct s_nodes
 	int			*ori_fd;
 	int				built;
 	int				to_pipe;
+	int				exit;
 	struct s_nodes	*next;
 }	t_node;
 

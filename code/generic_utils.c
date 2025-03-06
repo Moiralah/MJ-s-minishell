@@ -16,7 +16,7 @@ t_node	*function_matching(char *str)
 {
 	char	**comm_n_flags;
 
-	comm_n_flags = ft_split(str, ' ');
+	comm_n_flags = ft_splitmj(str, ' ');
 	free(str);
 	if (!comm_n_flags[0])
 		return (NULL);
@@ -52,7 +52,6 @@ char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
 		if (comm[i] != ch)
 			continue;
 		fname = ft_substr(comm, i, fname_len(comm + i, " <>"));
-		// printf("Fname: |%s|\n", fname);
 		if (comm[i + 1] == ch)
 			cur_node[0]->next = create_redir_node(ch + 1, fname);
 		else
@@ -83,6 +82,7 @@ int	pipe_handling(t_node *start, int **fd, int len)
 	close(start->ori_fd[0]);
 	close(start->ori_fd[1]);
 	free(*fd);
+	free(start->ori_fd);
 	return (1);
 }
 

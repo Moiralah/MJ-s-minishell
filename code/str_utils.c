@@ -32,11 +32,8 @@ char	*strnrplc(char *str, char *replace, int start, int len)
 	char	*before;
 	char	*after;
 
-	// printf("Start: %d | Len: %d\n", start, len);
 	before = ft_substr(str, 0, start);
 	after = ft_substr(str, start + len + 1, ft_strlen(str) - start - len);
-	/* printf("Before: %s\n", before);
-	printf("After: %s\n", after); */
 	if (replace)
 	{
 		free(str);

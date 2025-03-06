@@ -12,8 +12,6 @@
 
 #include "minishell.h"
 
-// var[0] = var_name
-// var[1] = var_value
 char	*expansion(char *str, t_list *envp, int i)
 {
 	char	*s;
@@ -86,20 +84,22 @@ int	legitnum(char *str)
 
 void	change_io(t_node *start, t_node *cur, pid_t pid, int *fd, int com_amnt)
 {
-	if ((!cur->to_pipe) || (com_amnt == 1))
+	if ((cur && !cur->to_pipe) || (com_amnt == 1))
 		return ;
-	if ((pid > 0) && (cur->to_pipe == com_amnt))
+	if ((pid > 0) && cur && (cur->to_pipe == com_amnt))
 		dup2(start->ori_fd[0], STDIN_FILENO);
-	if ((pid > 0) && (cur->to_pipe == com_amnt))
+	if ((pid > 0) && cur && (cur->to_pipe == com_amnt))
 		dup2(start->ori_fd[1], STDOUT_FILENO);
 	if (pid > 0)
+		return ;
+	if (!cur && !dup2(start->ori_fd[0], STDIN_FILENO))
 		return ;
 	if (cur->to_pipe == 1)
 		dup2(fd[1], STDOUT_FILENO);
 	else if (cur->to_pipe == com_amnt)
 	{
 		dup2(fd[(cur->to_pipe * 2) - 4], STDIN_FILENO);
-		dup2(start->ori_fd[0], STDOUT_FILENO);
+		dup2(start->ori_fd[1], STDOUT_FILENO);
 	}
 	else
 	{
@@ -115,9 +115,7 @@ void	heredoc(char *str)
 	line = readline(">");
 	while (ft_strncmp(line, str, ft_strlen(line) + 1) != 0)
 	{
-		printf("Heredoc running\n");
 		free(line);
 		line = readline(">");
 	}
-	printf("Heredoc ends\n");
 }

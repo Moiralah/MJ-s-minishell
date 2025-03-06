@@ -12,15 +12,14 @@
 
 #include "libft.h"
 
-static int	in_quote(char const *s, int i)
+static int	in_quote(char const *s)
 {
-	if ((s[i] == '"') && ft_strchr(s + i + 1, '"'))
-		i = ft_strchr(s + i + 1, '"') - s;
-	else if ((s[i] == 39) && ft_strchr(s + i + 1, 39))
-		i = ft_strchr(s + i + 1, 39) - s;
+	if (*s == '"')
+		return(ft_strchr(s + 1, '"') - s);
+	else if (*s == 39)
+		return(ft_strchr(s + 1, 39) - s);
 	else
 		return (-1);
-	return (i);
 }
 
 static int	numwords(char const *s, char c)
@@ -33,11 +32,8 @@ static int	numwords(char const *s, char c)
 	while (s[i])
 	{
 		if (s[i] == '"' || s[i] == 39)
-		{
-			i = in_quote(s, i);
-			words_count++;
-		}
-		else if (s[i] != c && (s[i + 1] == c || s[i + 1] == 0))
+			i += in_quote(s + i);
+		if (s[i] != c && (s[i + 1] == c || s[i + 1] == 0))
 			words_count++;
 		i++;
 	}
@@ -62,11 +58,8 @@ static int	split_words(char **result, char const *s, char c, int word)
 	while (s[i_end])
 	{
 		if (s[i_end] == '"' || s[i_end] == 39)
-		{
-			i_start = i_end;
-			i_end = in_quote(s, i_end);
-		}
-		else if (s[i_end] == c || s[i_end] == 0)
+			i_end += in_quote(s + i_end);
+		else if (s[i_end] == c)
 			i_start = i_end + 1;
 		if (s[i_end] != c && (s[i_end + 1] == c || s[i_end + 1] == 0))
 		{
@@ -87,7 +80,7 @@ char	**ft_splitmj(char const *s, char c)
 
 	if (!s)
 		return (NULL);
-	result = (char **)malloc((numwords(s, c) + 1) * sizeof(char *));
+	result = ft_calloc(numwords(s, c) + 1, sizeof(char *));
 	if (!result)
 		return (NULL);
 	if (!split_words(result, s, c, 0))

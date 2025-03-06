@@ -38,9 +38,8 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 			signal_ignore();
 		cur = cur->next;
 	}
+	change_io(start, cur, pid, fd, com_amnt);
 	pipe_handling(start, &fd, com_amnt);
-	close(start->ori_fd[0]);
-	close(start->ori_fd[1]);
 	int	i = 0;
 	while (i != -1)
 		i = waitpid(-1, NULL, 0);
@@ -52,9 +51,7 @@ t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
 {
 	comm = expansion(comm, start_node->envp, 0);
 	comm = fnames_to_nodes(&cur_node, comm, '<');
-	// printf("Comm 1: %s\n", comm);
 	comm = fnames_to_nodes(&cur_node, comm, '>');
-	// printf("Comm 2: %s\n", comm);
 	cur_node->next = function_matching(comm);
 	if (cur_node->next)
 		return (cur_node->next);
@@ -92,7 +89,7 @@ char	*listening(int i, int q)
 
 	line = readline("MJ > ");
 	if (line == NULL)
-		(printf("ERxit\n"), exit(0));
+		(printf("exit\n"), exit(0));
 	while (line[i] != '\0')
 	{
 		q = 0;
