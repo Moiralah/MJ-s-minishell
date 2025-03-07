@@ -36,7 +36,6 @@ t_node	*create_cd_node(char **path)
 	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
-	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -65,7 +64,6 @@ t_node	*create_echo_node(char **to_print)
 	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
-	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -81,7 +79,6 @@ t_node	*create_pwd_node(char **params_to_verify)
 	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
-	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -110,7 +107,6 @@ t_node	*create_export_node(char **to_set)
 	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
-	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
@@ -139,7 +135,6 @@ t_node	*create_unset_node(char **to_unset)
 	new_node->ori_fd = NULL;
 	new_node->built = 1;
 	new_node->to_pipe = 0;
-	new_node->exit = 0;
 	new_node->next = NULL;
 	return (new_node);
 }
