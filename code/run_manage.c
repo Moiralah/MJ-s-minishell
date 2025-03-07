@@ -23,7 +23,10 @@ int	run_redir(char **params, t_node *start_node, t_node *self)
 	else if (params[0][0] == '?')
 		fd = open(params[1], O_CREAT | O_WRONLY | O_APPEND, 0666);
 	if (fd == -1)
-		error_exit(strerror(errno), start_node, self);
+	{
+		printf("File can't be accessed\n");
+		return (error_exit(start_node, self), 127);
+	}
 	if (params[0][0] == '<')
 		dup2(fd, STDIN_FILENO);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
@@ -38,7 +41,10 @@ int	run_env(char **params, t_node *start_node, t_node *self)
 
 	(void) self;
 	if (strlist_len(params) != 1)
-		error_exit("Env with too many args\n", start_node, self);
+	{
+		printf("Env should be run without any arguments\n");
+		return (error_exit(start_node, self), 1);
+	}
 	temp = start_node->envp;
 	if (!ft_strcmp(params[0], "export"))
 	{
@@ -82,7 +88,7 @@ int	run_exec(char **params, t_node *start_node, t_node *self)
 	free2d(arr_e);
 	if (*line != '\0')
 		free(line);
-	return (error_exit(strerror(errno), start_node, self), 0);
+	return (error_exit(start_node, self), 127);
 }
 
 int	run_exit(char **params, t_node *start_node, t_node *self)

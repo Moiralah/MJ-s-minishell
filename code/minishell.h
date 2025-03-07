@@ -40,16 +40,15 @@ typedef struct s_list
 
 //////////////////// Execution Node ////////////////////////////////////////
 
-typedef struct s_nodes
+typedef struct s_n
 {
 	t_list			*envp;
 	char			**params;
-	int				(*run)(char **p, struct s_nodes *st, struct s_nodes *s);
+	int				(*run)(char **p, struct s_n *t, struct s_n *s);
 	int				*ori_fd;
 	int				built;
 	int				to_pipe;
-	int				exit;
-	struct s_nodes	*next;
+	struct s_n		*next;
 }	t_node;
 
 //////////////////// Create Node ////////////////////////////////////////
@@ -120,7 +119,7 @@ int		pipe_handling(t_node *start, int **pipe, int len);
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev);
 
-void	error_exit(char *str_error, t_node *start, t_node *cur);
+void	error_exit(t_node *start, t_node *cur);
 
 ////////////////////  More Generic Utils ///////////////////////////////////
 
@@ -132,7 +131,7 @@ int		legitnum(char *str);
 
 void	change_io(t_node **n, pid_t pid, int *fd, int com_amnt);
 
-void	heredoc(char *str);
+int		run_heredoc(char **params, t_node *start, t_node *self);
 
 ////////////////////  Signal Utils ////////////////////////////////////////
 
@@ -164,9 +163,9 @@ char	*expand_error_code(t_exit *ex, char *str, int *i, int *q);
 
 int		verify_ch(char ch, char *set);
 
-int		run_heredoc(char **params, t_node *start, t_node *self);
+int		run_non_built_in(t_node *start, t_node *cur, t_exit **ex, char **input);
 
-void	resetting(t_node *start, char *input, int *fd, int com_amnt);
+t_node	**resetting(t_node *start, char *input, int **fd, int com_amnt);
 
 ////////////////////  END ///////////////////////////////////////////////
 

@@ -12,14 +12,14 @@
 
 #include "minishell.h"
 
-void	executing(t_node *start, int *fd, int com_amnt, char *input)
+void	executing(t_node *start, t_exit *ex, int com_amnt, char *input)
 {
-	t_node	*n[2];
+	t_node	**n;
 	pid_t	pid;
+	int		*fd;
 
-	n[0] = start;
-	n[1] = start->next;
-	pipe_handling(start, &fd, com_amnt);
+	fd = NULL;
+	n = resetting(start, input, &fd, com_amnt);
 	while (n[1] != NULL)
 	{
 		pid = -2;
@@ -27,17 +27,18 @@ void	executing(t_node *start, int *fd, int com_amnt, char *input)
 			pid = fork();
 		change_io(n, pid, fd, com_amnt);
 		if (pid == -1)
-			error_exit(strerror(errno), n[0], n[1]);
-		if ((pid == -2) && (n[1]->run(n[1]->params, n[0], n[1]) == 1))
-			(free(input), input = strjoin_n_gnl(STDOUT_FILENO));
+			(error_exit(n[0], n[1]), ex->code = errno);
+		if (pid == -1)
+			return ;
+		if ((pid == -2) && run_non_built_in(n[0], n[1], &ex, &input))
+			return ;
 		else if ((pid == 0) && pipe_handling(n[0], &fd, com_amnt))
 			(restore_signal(), n[1]->run(n[1]->params, n[0], n[1]));
-		if (pid > 0)
-			signal_ignore();
+		signal_ignore();
 		n[1] = n[1]->next;
 	}
 	change_io(n, pid, fd, com_amnt);
-	resetting(n[0], input, fd, com_amnt);
+	resetting(n[0], input, &fd, com_amnt);
 }
 
 t_node	*linking(t_node *start_node, t_node *cur_node, t_exit *ex, char *comm)

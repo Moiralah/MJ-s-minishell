@@ -18,7 +18,7 @@ int	run_cd(char **params, t_node *start_node, t_node *self)
 	char	*home;
 
 	if (strlist_len(params) > 2)
-		error_exit(NULL, start_node, self);
+		return (error_exit(start_node, self), 1);
 	home = ft_getenv("HOME", start_node->envp);
 	if (!params[1] || !ft_strcmp(params[1], home) || params[1][0] == '~')
 		new_path = home;
@@ -30,7 +30,7 @@ int	run_cd(char **params, t_node *start_node, t_node *self)
 	if (chdir(new_path) == -1)
 	{
 		printf("bash: cd: %s: No such file or directory\n", new_path);
-		error_exit(NULL, start_node, self);
+		return (error_exit(start_node, self), 1);
 	}
 	ft_setenv(&(start_node->envp), "PWD", getcwd(NULL, 0), 1);
 	if (params[1] && (params[1][0] == '-'))
@@ -67,7 +67,7 @@ int	run_pwd(char **params, t_node *start_node, t_node *self)
 	(void) start_node;
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
-		error_exit(strerror(errno), start_node, self);
+		return (error_exit(start_node, self), errno);
 	printf("%s\n", cwd);
 	free(cwd);
 	free2d(params);
@@ -92,7 +92,7 @@ int	run_export(char **params, t_node *start_node, t_node *self)
 		if (q == 0)
 		{
 			printf("bash: export: %s: not a valid identifier\n", params[i]);
-			error_exit(NULL, start_node, self);
+			return (error_exit(start_node, self), 1);
 		}
 		key = ft_substr(params[i], 0, q);
 		val = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);

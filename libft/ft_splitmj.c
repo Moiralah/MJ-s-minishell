@@ -15,9 +15,9 @@
 static int	in_quote(char const *s)
 {
 	if (*s == '"')
-		return(ft_strchr(s + 1, '"') - s);
+		return (ft_strchr(s + 1, '"') - s);
 	else if (*s == 39)
-		return(ft_strchr(s + 1, 39) - s);
+		return (ft_strchr(s + 1, 39) - s);
 	else
 		return (-1);
 }
