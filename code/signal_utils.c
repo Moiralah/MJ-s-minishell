@@ -110,9 +110,6 @@ void sigquit_child(int signo)
     write(2, "Quit (core dumped)\n", 20);
 }
 
-
-
-
 void restore_signal(void)
 {
     struct sigaction sa;
