@@ -14,42 +14,35 @@
 
 void	executing(t_node *start, int *fd, int com_amnt, char *input)
 {
-	t_node	*cur;
+	t_node	*n[2];
 	pid_t	pid;
 
-	cur = start->next;
+	n[0] = start;
+	n[1] = start->next;
 	pipe_handling(start, &fd, com_amnt);
-	while (cur != NULL)
+	while (n[1] != NULL)
 	{
 		pid = -2;
-		if (!cur->built)
+		if (!n[1]->built)
 			pid = fork();
-		change_io(start, cur, pid, fd, com_amnt);
+		change_io(n, pid, fd, com_amnt);
 		if (pid == -1)
-			error_exit(strerror(errno), start, cur);
-		if ((pid == -2) && (cur->run(cur->params, start, cur) == 1))
-		{
-			// free(input);
-			// input = strjoin_n_gnl(STDOUT_FILENO);
-		}
-		else if ((pid == 0) && pipe_handling(start, &fd, com_amnt))
-			(restore_signal(), cur->run(cur->params, start, cur));
+			error_exit(strerror(errno), n[0], n[1]);
+		if ((pid == -2) && (n[1]->run(n[1]->params, n[0], n[1]) == 1))
+			(free(input), input = strjoin_n_gnl(STDOUT_FILENO));
+		else if ((pid == 0) && pipe_handling(n[0], &fd, com_amnt))
+			(restore_signal(), n[1]->run(n[1]->params, n[0], n[1]));
 		if (pid > 0)
 			signal_ignore();
-		cur = cur->next;
+		n[1] = n[1]->next;
 	}
-	change_io(start, cur, pid, fd, com_amnt);
-	pipe_handling(start, &fd, com_amnt);
-	int	i = 0;
-	while (i != -1)
-		i = waitpid(-1, NULL, 0);
-	add_history(input);
-	free(input);
+	change_io(n, pid, fd, com_amnt);
+	resetting(n[0], input, fd, com_amnt);
 }
 
-t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
+t_node	*linking(t_node *start_node, t_node *cur_node, t_exit *ex, char *comm)
 {
-	comm = expansion(comm, start_node->envp, 0);
+	comm = expansion(comm, start_node->envp, ex, 0);
 	comm = fnames_to_nodes(&cur_node, comm, '<');
 	comm = fnames_to_nodes(&cur_node, comm, '>');
 	cur_node->next = function_matching(comm);
@@ -58,7 +51,7 @@ t_node	*linking(t_node *start_node, t_node *cur_node, char *comm)
 	return (cur_node);
 }
 
-void	initialising(t_list **envp, char **comms, char *line)
+void	initialising(t_list **envp, t_exit *ex, char **comms, char *line)
 {
 	t_node	*nodes[2];
 	int		i;
@@ -68,7 +61,7 @@ void	initialising(t_list **envp, char **comms, char *line)
 	nodes[1] = nodes[0];
 	while (comms[++i] != NULL)
 	{
-		nodes[1] = linking(nodes[0], nodes[1], comms[i]);
+		nodes[1] = linking(nodes[0], nodes[1], ex, comms[i]);
 		nodes[1]->to_pipe = i + 1;
 	}
 	free(comms);
@@ -115,18 +108,21 @@ char	*listening(int i, int q)
 int	main(int argc, char **argv, char **local_envp)
 {
 	t_list	*envp;
+	t_exit	*ex;
 	char	*input;
 	int		running;
 
 	running = -1;
 	if ((argc > 1) && (argv != NULL))
 		return (printf("Don't give any args"), -1);
+	ex = ft_calloc(1, sizeof(t_exit));
+	ex->code = 0;
 	envp = init_envp(local_envp);
 	while (running)
 	{
 		init_signal();
 		input = listening(0, 0);
-		initialising(&envp, ft_splitmj(input, '|'), input);
+		initialising(&envp, ex, ft_splitmj(input, '|'), input);
 	}
 	while (envp != NULL)
 		remove_link(&envp, envp, NULL);

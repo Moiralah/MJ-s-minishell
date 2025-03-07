@@ -50,7 +50,7 @@ char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
 		else if (comm[i] == 39)
 			i = ft_strchr(comm + i + 1, 39) - comm;
 		if (comm[i] != ch)
-			continue;
+			continue ;
 		fname = ft_substr(comm, i, fname_len(comm + i, " <>"));
 		if (comm[i + 1] == ch)
 			cur_node[0]->next = create_redir_node(ch + 1, fname);

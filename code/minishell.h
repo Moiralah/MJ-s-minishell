@@ -24,6 +24,13 @@
 
 //////////////////// Link List Node ////////////////////////////////////////
 
+typedef struct s_exit
+{
+	int	code;
+}	t_exit;
+
+//////////////////// Link List Node ////////////////////////////////////////
+
 typedef struct s_list
 {
 	char			*key;
@@ -38,7 +45,7 @@ typedef struct s_nodes
 	t_list			*envp;
 	char			**params;
 	int				(*run)(char **p, struct s_nodes *st, struct s_nodes *s);
-	int			*ori_fd;
+	int				*ori_fd;
 	int				built;
 	int				to_pipe;
 	int				exit;
@@ -117,13 +124,13 @@ void	error_exit(char *str_error, t_node *start, t_node *cur);
 
 ////////////////////  More Generic Utils ///////////////////////////////////
 
-char	*expansion(char *str, t_list *envp, int i);
+char	*expansion(char *str, t_list *envp, t_exit *ex, int i);
 
 char	*find_path(char *params, t_list *envp);
 
 int		legitnum(char *str);
 
-void	change_io(t_node *start, t_node *cur, pid_t pid, int *fd, int com_amnt);
+void	change_io(t_node **n, pid_t pid, int *fd, int com_amnt);
 
 void	heredoc(char *str);
 
@@ -149,10 +156,17 @@ int		fname_len(char *word, char *ig_set);
 
 int		strlist_len(char **strlist);
 
+///// TEMP ////////
 
-///// TEMP /////
+t_node	*create_heredoc_node(void);
 
-void	run_node(t_node **n, char **input, int *fd, int com_amnt);
+char	*expand_error_code(t_exit *ex, char *str, int *i, int *q);
+
+int		verify_ch(char ch, char *set);
+
+int		run_heredoc(char **params, t_node *start, t_node *self);
+
+void	resetting(t_node *start, char *input, int *fd, int com_amnt);
 
 ////////////////////  END ///////////////////////////////////////////////
 

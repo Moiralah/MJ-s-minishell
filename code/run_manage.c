@@ -18,8 +18,6 @@ int	run_redir(char **params, t_node *start_node, t_node *self)
 
 	if (params[0][0] == '<')
 		fd = open(params[1], O_RDONLY, 0666);
-	else if (params[0][0] == '=')
-		heredoc(params[1]);
 	else if (params[0][0] == '>')
 		fd = open(params[1], O_CREAT | O_WRONLY | O_TRUNC, 0666);
 	else if (params[0][0] == '?')
@@ -30,9 +28,7 @@ int	run_redir(char **params, t_node *start_node, t_node *self)
 		dup2(fd, STDIN_FILENO);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
 		dup2(fd, STDOUT_FILENO);
-	if (params[0][0] != '=')
-		return (free2d(params), close(fd), 0);
-	return (free2d(params), 1);
+	return (free2d(params), close(fd), 0);
 }
 
 int	run_env(char **params, t_node *start_node, t_node *self)
@@ -70,7 +66,7 @@ int	run_exec(char **params, t_node *start_node, t_node *self)
 
 	len = 0;
 	temp = start_node->envp;
-	while ((temp != NULL) && (len++))
+	while ((temp != NULL) && (++len))
 		temp = temp->next;
 	arr_e = ft_calloc(len + 1, sizeof(char *));
 	arr_e[len] = NULL;
@@ -84,7 +80,8 @@ int	run_exec(char **params, t_node *start_node, t_node *self)
 	line = find_path(params[0], start_node->envp);
 	execve(line, params, arr_e);
 	free2d(arr_e);
-	free(line);
+	if (*line != '\0')
+		free(line);
 	return (error_exit(strerror(errno), start_node, self), 0);
 }
 
