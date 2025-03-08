@@ -97,13 +97,14 @@ void	remove_link(t_list **head, t_list *cur, t_list *prev)
 	free(cur);
 }
 
-void	error_exit(char *error_str, t_node *start, t_node *cur)
+void	error_exit(t_node *start, t_node *cur)
 {
 	t_node	*temp;
 	int		to_free;
 
-	printf("Error: %s\n", error_str);
 	to_free = 0;
+	if (errno)
+		printf("Error: %s\n", strerror(errno));
 	while (start->envp != NULL)
 		remove_link(&(start->envp), start->envp, NULL);
 	temp = start;
@@ -119,5 +120,4 @@ void	error_exit(char *error_str, t_node *start, t_node *cur)
 			free2d(start->params);
 		free(start);
 	}
-	exit(1);
 }
