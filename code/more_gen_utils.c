@@ -109,14 +109,27 @@ void	change_io(t_node **n, pid_t pid, int *fd, int com_amnt)
 int	run_heredoc(char **params, t_node *start, t_node *self)
 {
 	char	*line;
+	int		tmpfile;
 
 	(void) start;
 	(void) self;
-	line = readline(">");
-	while (ft_strncmp(line, params[0], ft_strlen(line) + 1) != 0)
+
+	tmpfile = open(".tmp", O_CREAT | O_RDWR | O_TRUNC, 0777);
+	if (tmpfile == -1)
+		error_exit("No such file or directory\n");
+	while (1)
 	{
+		readline(">");
+		line = get_next_line(STDIN_FILENO);
+		if (ft_strcmp(line, params[0]) == 0
+			&& line[ft_strlen(params[0]) + 1] == '\0')
+		{
+			free(line);
+			break;
+		}
+		write(tmpfile, line, ft_strlen(line));
 		free(line);
-		line = readline(">");
 	}
+	close(tmpfile);
 	return (0);
 }
