@@ -100,10 +100,7 @@ t_node	*create_redir_node(char ch, char *filename)
 	char	trim_qs[3];
 
 	if (ch == '=')
-	{
-		free(filename);
-		return (create_heredoc_node());
-	}
+		return (create_heredoc_node(ft_splitmj(filename, ' ')));
 	str_ch[0] = ch;
 	str_ch[1] = '\0';
 	trim_qs[0] = '"';

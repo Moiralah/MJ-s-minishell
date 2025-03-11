@@ -11,12 +11,12 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-t_node	*create_heredoc_node(void)
+t_node	*create_heredoc_node(char **delimiter)
 {
 	t_node	*new_node;
 
 	new_node = ft_calloc(1, sizeof(t_node));
-	new_node->params = NULL;
+	new_node->params = delimiter;
 	new_node->run = run_heredoc;
 	new_node->to_pipe = 1;
 	new_node->next = NULL;

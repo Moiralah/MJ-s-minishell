@@ -166,7 +166,7 @@ int		strlist_len(char **strlist);
 
 ///// TEMP ////////
 
-t_node	*create_heredoc_node(void);
+t_node	*create_heredoc_node(char **delimiter);
 
 // char	*expand_error_code(t_exit *ex, char *str, int *i, int *q);
 

@@ -34,6 +34,8 @@ char	*strnrplc(char *str, char *replace, int start, int len)
 
 	before = ft_substr(str, 0, start);
 	after = ft_substr(str, start + len + 1, ft_strlen(str) - start - len);
+	if (after == NULL)
+		after = ft_strdup("");
 	if (replace)
 	{
 		free(str);

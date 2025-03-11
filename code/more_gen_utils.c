@@ -104,27 +104,27 @@ void	change_io(t_node *cur, t_head *head)
 int	run_heredoc(char **params, t_head *head)
 {
 	char	*line;
-	int		tmpfile;
+	int		pipefd[2];
 
-	(void) start;
-	(void) self;
-
-	tmpfile = open(".tmp", O_CREAT | O_RDWR | O_TRUNC, 0777);
-	if (tmpfile == -1)
-		error_exit("No such file or directory\n");
+	(void) head;
+	if (pipe(pipefd) == -1)
+		return (printf("Error: failed to create pipe\n"), 1);
 	while (1)
 	{
-		readline(">");
-		line = get_next_line(STDIN_FILENO);
-		if (ft_strcmp(line, params[0]) == 0
-			&& line[ft_strlen(params[0]) + 1] == '\0')
+		line = readline(">");
+		if (!line)
+			break ;
+		if (ft_strcmp(line, params[1]) == 0)
 		{
 			free(line);
-			break;
+			break ;
 		}
-		write(tmpfile, line, ft_strlen(line));
+		write(pipefd[1], line, ft_strlen(line));
+		write(pipefd[1], "\n", 1);
 		free(line);
 	}
-	close(tmpfile);
+	close(pipefd[1]);
+	dup2(pipefd[0], STDIN_FILENO);
+	close(pipefd[0]);
 	return (0);
 }
