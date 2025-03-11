@@ -16,40 +16,37 @@ t_node	*create_heredoc_node(void)
 	t_node	*new_node;
 
 	new_node = ft_calloc(1, sizeof(t_node));
-	new_node->envp = NULL;
 	new_node->params = NULL;
 	new_node->run = run_heredoc;
-	new_node->built = 1;
 	new_node->to_pipe = 1;
 	new_node->next = NULL;
 	return (new_node);
 }
 
-char	*expand_error_code(t_exit *ex, char *str, int *i, int *q)
+char	**linklist_to_strlist(t_list *linklist)
 {
-	char	*exit_code;
+	t_list	*temp;
+	char	**strlist;
+	char	*line;
+	int		len;
 
-	if (*q == -2)
-		return (str);
-	if (str[*q + 1] != '?')
-		return (str);
-	exit_code = ft_itoa(ex->code);
-	str = strnrplc(str, exit_code, *q + 1, 1);
-	*i = -1;
-	*q = -2;
-	return (str);
-}
-
-int	run_non_built_in(t_node *start, t_node *cur, t_exit **ex, char **input)
-{
-	int	i;
-
-	i = cur->run(cur->params, start, cur);
-	if (i)
-		ex[0]->code = i;
-	free(*input);
-	*input = strjoin_n_gnl(STDOUT_FILENO);
-	return (i);
+	len = 0;
+	temp = linklist;
+	while (temp != NULL)
+	{
+		len++;
+		temp = temp->next;
+	}
+	strlist = ft_calloc(len + 1, sizeof(char *));
+	temp = linklist;
+	while (temp != NULL)
+	{
+		line = ft_strjoin(ft_strdup(temp->key), ft_strdup("="));
+		line = ft_strjoin(line, ft_strdup(temp->val));
+		strlist[strlist_len(strlist)] = line;
+		temp = temp->next;
+	}
+	return (strlist);
 }
 
 int	verify_ch(char ch, char *set)
@@ -71,24 +68,48 @@ int	verify_ch(char ch, char *set)
 	return (0);
 }
 
-t_node	**resetting(t_node *start, char *input, int **fd, int com_amnt)
+void	free_exec_list(t_head *head)
 {
-	t_node	**nodes;
-	int		i;
+	t_node	*temp;
 
-	i = 0;
-	if (!fd)
+	while (head->start != NULL)
 	{
-		nodes = ft_calloc(2, sizeof(t_node));
-		nodes[0] = start;
-		nodes[1] = start->next;
-		pipe_handling(start, fd, com_amnt);
-		return (nodes);
+		temp = head->start;
+		head->start = head->start->next;
+		free2d(temp->params);
+		free(temp);
 	}
-	pipe_handling(start, fd, com_amnt);
-	while (i != -1)
-		i = waitpid(-1, NULL, 0);
-	add_history(input);
-	free(input);
-	return (NULL);
+	free(head->input);
+	free(head->ori_fd);
+	free(head->fd);
+	free(head);
 }
+/* char	*expand_error_code(t_exit *ex, char *str, int *i, int *q)
+{
+	char	*exit_code;
+
+	if (*q == -2)
+		return (str);
+	if (str[*q + 1] != '?')
+		return (str);
+	exit_code = ft_itoa(ex->code);
+	str = strnrplc(str, exit_code, *q, 1);
+	*i = -1;
+	*q = -2;
+	return (str);
+} */
+
+/* int	run_node(t_node *start, t_node *cur, char *input, )
+{
+	int	i;
+
+	i = n[1]->run(n[1]->params, n[0]);
+	ex[0]->code = 0;
+	if (i > 0)
+		ex[0]->code = i;
+	if (i != -1)
+		return (i);
+	free(*input);
+	*input = strjoin_n_gnl(STDOUT_FILENO);
+	return (i);
+} */

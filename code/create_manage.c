@@ -12,22 +12,22 @@
 
 #include "minishell.h"
 
-t_node	*create_generic_node(t_list *envp)
+t_head	*create_head_node(t_list *envp, char *input, int com_amnt)
 {
-	t_node	*new_node;
+	t_head	*new_node;
 	int		*fd;
 
 	fd = ft_calloc(2, sizeof(int));
 	fd[0] = dup(STDIN_FILENO);
 	fd[1] = dup(STDOUT_FILENO);
-	new_node = ft_calloc(1, sizeof(t_node));
+	new_node = ft_calloc(1, sizeof(t_head));
 	new_node->envp = envp;
-	new_node->params = NULL;
-	new_node->run = NULL;
+	new_node->input = input;
 	new_node->ori_fd = fd;
-	new_node->built = 1;
-	new_node->to_pipe = 0;
-	new_node->next = NULL;
+	new_node->fd = NULL;
+	new_node->com_amnt = com_amnt;
+	new_node->start = NULL;
+	pipe_handling(&new_node->fd, new_node->ori_fd, com_amnt);
 	return (new_node);
 }
 
@@ -49,11 +49,8 @@ t_node	*create_exec_node(char **comm_n_flags)
 		comm_n_flags[i] = trimmed;
 	}
 	new_node = ft_calloc(1, sizeof(t_node));
-	new_node->envp = NULL;
 	new_node->params = comm_n_flags;
 	new_node->run = run_exec;
-	new_node->ori_fd = NULL;
-	new_node->built = 0;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
 	return (new_node);
@@ -77,11 +74,8 @@ t_node	*create_exit_node(char **code)
 		code[i] = trimmed;
 	}
 	new_node = ft_calloc(1, sizeof(t_node));
-	new_node->envp = NULL;
 	new_node->params = code;
 	new_node->run = run_exit;
-	new_node->ori_fd = NULL;
-	new_node->built = 1;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
 	return (new_node);
@@ -92,11 +86,8 @@ t_node	*create_env_node(char **var)
 	t_node	*new_node;
 
 	new_node = ft_calloc(1, sizeof(t_node));
-	new_node->envp = NULL;
 	new_node->params = var;
 	new_node->run = run_env;
-	new_node->ori_fd = NULL;
-	new_node->built = 1;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
 	return (new_node);
@@ -106,25 +97,25 @@ t_node	*create_redir_node(char ch, char *filename)
 {
 	t_node	*new_node;
 	char	str_ch[2];
-	char	to_trim[3];
+	char	trim_qs[3];
 
 	if (ch == '=')
+	{
+		free(filename);
 		return (create_heredoc_node());
+	}
 	str_ch[0] = ch;
 	str_ch[1] = '\0';
-	to_trim[0] = '"';
-	to_trim[1] = 39;
-	to_trim[2] = '\0';
-	filename = ft_strtrim(filename, to_trim);
+	trim_qs[0] = '"';
+	trim_qs[1] = 39;
+	trim_qs[2] = '\0';
+	filename = ft_strtrim(filename, trim_qs);
 	new_node = ft_calloc(1, sizeof(t_node));
-	new_node->envp = NULL;
 	new_node->params = ft_calloc(3, sizeof(char));
 	new_node->params[0] = ft_strdup(str_ch);
 	new_node->params[1] = ft_strtrim(filename, " <>");
 	new_node->params[2] = NULL;
 	new_node->run = run_redir;
-	new_node->ori_fd = NULL;
-	new_node->built = 1;
 	new_node->to_pipe = 0;
 	new_node->next = NULL;
 	free (filename);

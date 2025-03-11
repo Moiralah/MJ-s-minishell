@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int	run_redir(char **params, t_node *start_node, t_node *self)
+int	run_redir(char **params, t_head *head)
 {
 	int	fd;
 
@@ -24,33 +24,32 @@ int	run_redir(char **params, t_node *start_node, t_node *self)
 		fd = open(params[1], O_CREAT | O_WRONLY | O_APPEND, 0666);
 	if (fd == -1)
 	{
-		printf("File can't be accessed\n");
-		return (error_exit(start_node, self), 127);
+		printf("bash: open: The file doesn't exists or can't be accessed\n");
+		return (2);
 	}
 	if (params[0][0] == '<')
-		dup2(fd, STDIN_FILENO);
+		dup2(fd, head->ori_fd[0]);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
-		dup2(fd, STDOUT_FILENO);
-	return (free2d(params), close(fd), 0);
+		dup2(fd, head->ori_fd[1]);
+	return (close(fd), 0);
 }
 
-int	run_env(char **params, t_node *start_node, t_node *self)
+int	run_env(char **params, t_head *head)
 {
 	t_list	*temp;
-	t_list	*copy;
+	t_list	*to_remove;
 
-	(void) self;
 	if (strlist_len(params) != 1)
 	{
-		printf("Env should be run without any arguments\n");
-		return (error_exit(start_node, self), 1);
+		printf("env: %s: No such file or directory\n", params[1]);
+		return (127);
 	}
-	temp = start_node->envp;
+	temp = head->envp;
 	if (!ft_strcmp(params[0], "export"))
 	{
-		temp = dup_env(start_node->envp);
+		temp = dup_env(head->envp);
 		ft_sortenv(&temp);
-		copy = temp;
+		to_remove = temp;
 	}
 	while (temp != NULL)
 	{
@@ -58,64 +57,57 @@ int	run_env(char **params, t_node *start_node, t_node *self)
 		temp = temp->next;
 	}
 	if (!ft_strcmp(params[0], "export"))
-		remove_link(&copy, copy, NULL);
-	free2d(params);
+		remove_link(&to_remove, to_remove, NULL);
 	return (0);
 }
 
-int	run_exec(char **params, t_node *start_node, t_node *self)
+int	run_exec(char **params, t_head *head)
 {
-	t_list	*temp;
-	char	**arr_e;
-	char	*line;
-	int		len;
+	pid_t	pid;
+	char	**arr_envp;
+	char	*path;
 
-	len = 0;
-	temp = start_node->envp;
-	while ((temp != NULL) && (++len))
-		temp = temp->next;
-	arr_e = ft_calloc(len + 1, sizeof(char *));
-	arr_e[len] = NULL;
-	temp = start_node->envp;
-	while (strlist_len(arr_e) < len)
+	arr_envp = linklist_to_strlist(head->envp);
+	path = find_path(params[0], head->envp);
+	if (!path)
+		return (printf("%s: command not found\n", params[0]), 127);
+	pid = fork();
+	if (pid == -1)
+		return (printf("bash: error: fork failed\n"), errno);
+	if (pid == 0)
 	{
-		line = ft_strjoin(ft_strdup(temp->key), ft_strdup("="));
-		arr_e[strlist_len(arr_e)] = ft_strjoin(line, ft_strdup(temp->val));
-		temp = temp->next;
+		pipe_handling(&head->fd, head->ori_fd, head->com_amnt);
+		restore_signal();
+		execve(path, params, arr_envp);
 	}
-	line = find_path(params[0], start_node->envp);
-	execve(line, params, arr_e);
-	free2d(arr_e);
-	if (*line != '\0')
-		free(line);
-	return (error_exit(start_node, self), 127);
+	signal_ignore();
+	return (0);
 }
 
-int	run_exit(char **params, t_node *start_node, t_node *self)
+int	run_exit(char **params, t_head *head)
 {
-	long long	exit_status;
+	long long int	exit_code;
 
-	(void) self;
-	(void) start_node;
 	if (strlist_len(params) == 1)
-		exit(0);
-	if (strlist_len(params) >= 2 && legitnum(params[1]))
 	{
-		exit_status = ft_atoll(params[1]);
-		if (strlist_len(params) > 2)
-		{
-			ft_putstr_fd("exit: too many arguments\n", 2);
-			return (0);
-		}
-		exit((unsigned char)exit_status);
+		free_exec_list(head);
+		exit(0);
 	}
+	else if (strlist_len(params) == 2 && legitnum(params[1]))
+	{
+		exit_code = ft_atoll(params[1]);
+		free_exec_list(head);
+		exit((unsigned char) exit_code);
+	}
+	else if (strlist_len(params) > 2)
+		return (ft_putstr_fd("exit: too many arguments\n", 2), 1);
 	else
 	{
 		ft_putstr_fd("exit: ", 2);
 		ft_putstr_fd(params[1], 2);
 		ft_putstr_fd(": numeric argument required\n", 2);
+		free_exec_list(head);
 		exit(2);
 	}
-	free2d(params);
 	return (0);
 }

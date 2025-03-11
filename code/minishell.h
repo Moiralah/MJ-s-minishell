@@ -38,22 +38,31 @@ typedef struct s_list
 	struct s_list	*next;
 }	t_list;
 
-//////////////////// Execution Node ////////////////////////////////////////
+//////////////////// Head Node /////////////////////////////////////////////
 
-typedef struct s_n
+typedef struct s_head
 {
 	t_list			*envp;
-	char			**params;
-	int				(*run)(char **p, struct s_n *t, struct s_n *s);
+	char			*input;
 	int				*ori_fd;
-	int				built;
+	int				*fd;
+	int				com_amnt;
+	struct s_node	*start;
+}	t_head;
+
+//////////////////// Execution Node ////////////////////////////////////////
+
+typedef struct s_node
+{
+	char			**params;
+	int				(*run)(char **p, struct s_head *head);
 	int				to_pipe;
-	struct s_n		*next;
+	struct s_node	*next;
 }	t_node;
 
 //////////////////// Create Node ////////////////////////////////////////
 
-t_node	*create_generic_node(t_list *envp);
+t_head	*create_head_node(t_list *envp, char *input, int com_amnt);
 
 t_node	*create_pipe_node(int *fd, int i, int final);
 
@@ -77,25 +86,25 @@ t_node	*create_redir_node(char ch, char *filename);
 
 //////////////////// Run Node //////////////////////////////////////////
 
-int		run_cd(char **params, t_node *start_node, t_node *self);
+int		run_cd(char **params, t_head *head);
 
-int		run_echo(char **params, t_node *start_node, t_node *self);
+int		run_echo(char **params, t_head *head);
 
-int		run_pwd(char **params, t_node *start_node, t_node *self);
+int		run_pwd(char **params, t_head *head);
 
-int		run_export(char **params, t_node *start_node, t_node *self);
+int		run_export(char **params, t_head *head);
 
-int		run_unset(char **params, t_node *start_node, t_node *self);
+int		run_unset(char **params, t_head *head);
 
-int		run_pipe(char **params, t_node *start_node, t_node *self);
+int		run_pipe(char **params, t_head *head);
 
-int		run_redir(char **params, t_node *start_node, t_node *self);
+int		run_redir(char **params, t_head *head);
 
-int		run_env(char **params, t_node *start_node, t_node *self);
+int		run_env(char **params, t_head *head);
 
-int		run_exec(char **params, t_node *start_node, t_node *self);
+int		run_exec(char **params, t_head *head);
 
-int		run_exit(char **params, t_node *start_node, t_node *self);
+int		run_exit(char **params, t_head *head);
 
 //////////////////// ENV Utils //////////////////////////////////////////
 
@@ -113,9 +122,9 @@ void	ft_sortenv(t_list **envp);
 
 t_node	*function_matching(char *str);
 
-char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch);
+char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch);
 
-int		pipe_handling(t_node *start, int **pipe, int len);
+int		pipe_handling(int **pipe, int *ori_fd, int len);
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev);
 
@@ -123,15 +132,15 @@ void	error_exit(t_node *start, t_node *cur);
 
 ////////////////////  More Generic Utils ///////////////////////////////////
 
-char	*expansion(char *str, t_list *envp, t_exit *ex, int i);
+char	*expansion(t_list *envp, t_exit *ex, char *str, int i);
 
 char	*find_path(char *params, t_list *envp);
 
 int		legitnum(char *str);
 
-void	change_io(t_node **n, pid_t pid, int *fd, int com_amnt);
+void	change_io(t_node *cur, t_head *head);
 
-int		run_heredoc(char **params, t_node *start, t_node *self);
+int		run_heredoc(char **params, t_head *head);
 
 ////////////////////  Signal Utils ////////////////////////////////////////
 
@@ -159,14 +168,17 @@ int		strlist_len(char **strlist);
 
 t_node	*create_heredoc_node(void);
 
-char	*expand_error_code(t_exit *ex, char *str, int *i, int *q);
+// char	*expand_error_code(t_exit *ex, char *str, int *i, int *q);
+
+char	**linklist_to_strlist(t_list *linklist);
 
 int		verify_ch(char ch, char *set);
 
-int		run_non_built_in(t_node *start, t_node *cur, t_exit **ex, char **input);
+void	free_exec_list(t_head *head);
 
-t_node	**resetting(t_node *start, char *input, int **fd, int com_amnt);
+// int		run_built_in(t_node **n, t_exit **ex, char **input);
 
+// t_node	**resetting(t_node *start, char *input, int **fd, int com_amnt);
 ////////////////////  END ///////////////////////////////////////////////
 
 #endif

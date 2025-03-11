@@ -37,7 +37,7 @@ t_node	*function_matching(char *str)
 	return (create_exec_node(comm_n_flags));
 }
 
-char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
+char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch)
 {
 	char	*fname;
 	int		i;
@@ -53,23 +53,21 @@ char	*fnames_to_nodes(t_node **cur_node, char *comm, char ch)
 			continue ;
 		fname = ft_substr(comm, i, fname_len(comm + i, " <>"));
 		if (comm[i + 1] == ch)
-			cur_node[0]->next = create_redir_node(ch + 1, fname);
+			cur_node->next = create_redir_node(ch + 1, fname);
 		else
-			cur_node[0]->next = create_redir_node(ch, fname);
-		cur_node[0] = cur_node[0]->next;
+			cur_node->next = create_redir_node(ch, fname);
+		cur_node = cur_node->next;
 		comm = strnrplc(comm, NULL, i, ft_strlen(fname));
 		i = 0;
 	}
 	return (comm);
 }
 
-int	pipe_handling(t_node *start, int **fd, int len)
+int	pipe_handling(int **fd, int *ori_fd, int len)
 {
 	int	i;
 
 	i = -1;
-	if (len <= 0)
-		return (-1);
 	if (fd[0] == NULL)
 	{
 		fd[0] = ft_calloc((len - 1) * 2, sizeof(int));
@@ -79,10 +77,8 @@ int	pipe_handling(t_node *start, int **fd, int len)
 	}
 	while (++i < ((len - 1) * 2))
 		close(fd[0][i]);
-	close(start->ori_fd[0]);
-	close(start->ori_fd[1]);
-	free(*fd);
-	free(start->ori_fd);
+	close(ori_fd[0]);
+	close(ori_fd[1]);
 	return (1);
 }
 
@@ -105,8 +101,6 @@ void	error_exit(t_node *start, t_node *cur)
 	to_free = 0;
 	if (errno)
 		printf("Error: %s\n", strerror(errno));
-	while (start->envp != NULL)
-		remove_link(&(start->envp), start->envp, NULL);
 	temp = start;
 	start = start->next;
 	free(temp);
@@ -114,10 +108,10 @@ void	error_exit(t_node *start, t_node *cur)
 	{
 		temp = start;
 		start = start->next;
-		if (start == cur)
+		if (temp == cur)
 			to_free = 1;
 		if (to_free)
-			free2d(start->params);
-		free(start);
+			free2d(temp->params);
+		free(temp);
 	}
 }

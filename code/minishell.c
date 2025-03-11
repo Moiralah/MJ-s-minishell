@@ -12,69 +12,74 @@
 
 #include "minishell.h"
 
-void	executing(t_node *start, t_exit *ex, int com_amnt, char *input)
+void	executing(t_head *head, t_exit *ex)
 {
-	t_node	**n;
-	pid_t	pid;
-	int		*fd;
+	t_node	*cur;
+	int		i;
 
-	fd = NULL;
-	n = resetting(start, input, &fd, com_amnt);
-	while (n[1] != NULL)
+	cur = head->start;
+	while (cur != NULL)
 	{
-		pid = -2;
-		if (!n[1]->built)
-			pid = fork();
-		change_io(n, pid, fd, com_amnt);
-		if (pid == -1)
-			(error_exit(n[0], n[1]), ex->code = errno);
-		if (pid == -1)
-			return ;
-		if ((pid == -2) && run_non_built_in(n[0], n[1], &ex, &input))
-			return ;
-		else if ((pid == 0) && pipe_handling(n[0], &fd, com_amnt))
-			(restore_signal(), n[1]->run(n[1]->params, n[0], n[1]));
-		signal_ignore();
-		n[1] = n[1]->next;
+		change_io(cur, head);
+		i = cur->run(cur->params, head);
+		if (i == -1)
+		{
+			free(head->input);
+			head->input = strjoin_n_gnl(head->ori_fd[1]);
+		}
+		ex->code = 0;
+		if (i > 0)
+			ex->code = i;
+		cur = cur->next;
 	}
-	change_io(n, pid, fd, com_amnt);
-	resetting(n[0], input, &fd, com_amnt);
+	change_io(cur, head);
+	pipe_handling(&head->fd, head->ori_fd, head->com_amnt);
+	i = 0;
+	while (i != -1)
+		i = waitpid(-1, NULL, 0);
+	add_history(head->input);
 }
 
-t_node	*linking(t_node *start_node, t_node *cur_node, t_exit *ex, char *comm)
+void	linking(t_head *head, t_exit *ex, char *comm, int index)
 {
-	comm = expansion(comm, start_node->envp, ex, 0);
-	comm = fnames_to_nodes(&cur_node, comm, '<');
-	comm = fnames_to_nodes(&cur_node, comm, '>');
-	cur_node->next = function_matching(comm);
-	if (cur_node->next)
-		return (cur_node->next);
-	return (cur_node);
+	t_node	*temp;
+
+	if (!head->start)
+		head->start = create_redir_node(0, NULL);
+	temp = head->start;
+	while (temp->next != NULL)
+		temp = temp->next;
+	comm = expansion(head->envp, ex, comm, 0);
+	comm = fnames_to_nodes(temp, comm, '<');
+	while (temp->next != NULL)
+		temp = temp->next;
+	comm = fnames_to_nodes(temp, comm, '>');
+	while (temp->next != NULL)
+		temp = temp->next;
+	temp->next = function_matching(comm);
+	temp->next->to_pipe = index + 1;
+	if (head->start->params[0][0] == 0)
+	{
+		temp = head->start;
+		head->start = temp->next;
+		free2d(temp->params);
+		free(temp);
+	}
 }
 
 void	initialising(t_list **envp, t_exit *ex, char **comms, char *line)
 {
-	t_node	*nodes[2];
+	t_head	*head;
 	int		i;
 
 	i = -1;
-	nodes[0] = create_generic_node(envp[0]);
-	nodes[1] = nodes[0];
+	head = create_head_node(*envp, line, strlist_len(comms));
 	while (comms[++i] != NULL)
-	{
-		nodes[1] = linking(nodes[0], nodes[1], ex, comms[i]);
-		nodes[1]->to_pipe = i + 1;
-	}
+		linking(head, ex, comms[i], i);
 	free(comms);
-	nodes[1] = nodes[0];
-	executing(nodes[1], NULL, i, line);
-	envp[0] = nodes[0]->envp;
-	while (nodes[0] != NULL)
-	{
-		nodes[1] = nodes[0];
-		nodes[0] = nodes[0]->next;
-		free(nodes[1]);
-	}
+	executing(head, ex);
+	*envp = head->envp;
+	free_exec_list(head);
 }
 
 char	*listening(int i, int q)

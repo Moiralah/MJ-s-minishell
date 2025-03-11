@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-char	*expansion(char *str, t_list *envp, t_exit *ex, int i)
+char	*expansion(t_list *envp, t_exit *ex, char *str, int i)
 {
 	char	*var[2];
 	int		q;
@@ -25,12 +25,13 @@ char	*expansion(char *str, t_list *envp, t_exit *ex, int i)
 			i = ft_strchr(str + i + 1, 39) - str + 1;
 		if (str[i] == '$')
 			q = i;
-		str = expand_error_code(ex, str, &i, &q);
 		if (verify_ch(str[i + 1], "0|9|10|32|34|36"))
 			var[0] = ft_substr(str, q + 1, i - q);
 		if (!var[0])
 			continue ;
 		var[1] = ft_strdup(ft_getenv(var[0], envp));
+		if (var[1][0] == '\0')
+			(free(var[1]), var[1] = ft_itoa(ex->code));
 		free(var[0]);
 		str = strnrplc(str, var[1], q, i - q);
 		i = -1;
@@ -80,33 +81,27 @@ int	legitnum(char *str)
 	return (1);
 }
 
-void	change_io(t_node **n, pid_t pid, int *fd, int com_amnt)
+void	change_io(t_node *cur, t_head *head)
 {
-	if ((n[1] && !n[1]->to_pipe) || (com_amnt == 1))
+	if (!cur && !dup2(head->ori_fd[0], STDIN_FILENO))
 		return ;
-	if ((pid > 0) && n[1] && (n[1]->to_pipe == com_amnt))
-		dup2(n[0]->ori_fd[0], STDIN_FILENO);
-	if ((pid > 0) && n[1] && (n[1]->to_pipe == com_amnt))
-		dup2(n[0]->ori_fd[1], STDOUT_FILENO);
-	if (pid > 0)
+	if ((!cur->to_pipe) || (head->com_amnt == 1))
 		return ;
-	if (!n[1] && !dup2(n[0]->ori_fd[0], STDIN_FILENO))
-		return ;
-	if (n[1]->to_pipe == 1)
-		dup2(fd[1], STDOUT_FILENO);
-	else if (n[1]->to_pipe == com_amnt)
+	if (cur->to_pipe == 1)
+		dup2(head->fd[1], STDOUT_FILENO);
+	else if (cur->to_pipe == head->com_amnt)
 	{
-		dup2(fd[(n[1]->to_pipe * 2) - 4], STDIN_FILENO);
-		dup2(n[0]->ori_fd[1], STDOUT_FILENO);
+		dup2(head->fd[(cur->to_pipe * 2) - 4], STDIN_FILENO);
+		dup2(head->ori_fd[1], STDOUT_FILENO);
 	}
 	else
 	{
-		dup2(fd[(n[1]->to_pipe * 2) - 4], STDIN_FILENO);
-		dup2(fd[(n[1]->to_pipe * 2) - 1], STDOUT_FILENO);
+		dup2(head->fd[(cur->to_pipe * 2) - 4], STDIN_FILENO);
+		dup2(head->fd[(cur->to_pipe * 2) - 1], STDOUT_FILENO);
 	}
 }
 
-int	run_heredoc(char **params, t_node *start, t_node *self)
+int	run_heredoc(char **params, t_head *head)
 {
 	char	*line;
 	int		tmpfile;
