@@ -24,9 +24,11 @@ char	*expansion(t_list *envp, t_exit *ex, char *str, int i)
 		if (str[i] == 39)
 			i = ft_strchr(str + i + 1, 39) - str + 1;
 		if (str[i] == '$')
-			q = i;
+
+{}			q = i;
 		if (verify_ch(str[i + 1], "0|9|10|32|34|36"))
 			var[0] = ft_substr(str, q + 1, i - q);
+		printf("%d | %d\n", q, i);
 		if (!var[0])
 			continue ;
 		var[1] = ft_strdup(ft_getenv(var[0], envp));
@@ -37,6 +39,7 @@ char	*expansion(t_list *envp, t_exit *ex, char *str, int i)
 		i = -1;
 		q = -2;
 	}
+	printf("%s\n", str);
 	return (str);
 }
 

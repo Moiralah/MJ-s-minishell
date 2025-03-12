@@ -69,6 +69,7 @@ int	pipe_handling(int **fd, int len)
 	int	i;
 
 	i = -1;
+	restore_signal();
 	if (fd[0] == NULL)
 	{
 		fd[0] = ft_calloc(len, sizeof(int));

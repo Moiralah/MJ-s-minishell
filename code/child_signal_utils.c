@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal_utils.c                                     :+:      :+:    :+:   */
+/*   child_signal_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:03:48 by huidris           #+#    #+#             */
-/*   Updated: 2025/02/25 23:03:48 by huidris          ###   ########.fr       */
+/*   Updated: 2025/03/13 02:17:01 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	restore_signal(void)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
+
 	sa.sa_handler = sigquit_child;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
@@ -33,12 +34,13 @@ void	restore_signal(void)
 void	sigint_child(int signo)
 {
 	(void) signo;
+	ft_putstr_fd("\n", 1);
 	g_signal = 130;
-	write(1, "\n", 1);
 }
 
 void	sigquit_child(int signo)
 {
 	(void) signo;
 	write(2, "Quit (core dumped)\n", 20);
+	g_signal = 131;
 }

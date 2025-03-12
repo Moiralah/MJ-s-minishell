@@ -105,10 +105,10 @@ int	run_exec(char **params, t_head *head)
 		return (printf("bash: error: fork failed\n"), errno);
 	if (pid == 0)
 	{
+		//restore_signal();
 		pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
 		close(head->ori_fd[0]);
 		close(head->ori_fd[1]);
-		restore_signal();
 		execve(path, params, arr_envp);
 	}
 	signal_ignore();
