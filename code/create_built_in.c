@@ -16,20 +16,15 @@ t_node	*create_cd_node(char **path)
 {
 	t_node	*new_node;
 	char	*trimmed;
-	// char	to_trim[3];
 	int		i;
 
 	i = -1;
-	/* to_trim[0] = '"';
-	to_trim[1] = 39;
-	to_trim[2] = '\0'; */
 	while (path[++i] != NULL)
 	{
-		//trimmed = ft_strtrim(path[i], to_trim);
-		trimmed = str_remove_set(path[i], "0|34|39");
+		trimmed = str_remove_set(path[i], "34|39");
 		free(path[i]);
 		path[i] = trimmed;
-	} 
+	}
 	new_node = ft_calloc(1, sizeof(t_node));
 	new_node->params = path;
 	new_node->run = run_cd;

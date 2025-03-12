@@ -52,10 +52,10 @@ char	*str_remove_set(char *str, char *set)
 		{
 			start = ft_strchr(str, ft_atoi(chs[i]));
 			if (start == NULL)
-				break;
+				break ;
 			q = start - str;
 			if (q == (long int) ft_strlen(str))
-				break;
+				break ;
 			str = strnrplc(str, NULL, q, 0);
 		}
 	}

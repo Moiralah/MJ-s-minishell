@@ -38,7 +38,7 @@ t_node	*create_exec_node(char **comm_n_flags)
 
 	i = -1;
 	while (comm_n_flags[++i] != NULL)
-		comm_n_flags[i] = str_remove_set(comm_n_flags[i], "0|34|39");
+		comm_n_flags[i] = str_remove_set(comm_n_flags[i], "34|39");
 	new_node = ft_calloc(1, sizeof(t_node));
 	new_node->params = comm_n_flags;
 	new_node->run = run_exec;

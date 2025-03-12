@@ -82,22 +82,3 @@ void	init_signal(void)
 	signal(SIGQUIT, SIG_IGN);
 	disable_echoctl();
 }
-
-// void	restore_signal(void)
-// {
-// 	signal(SIGINT, SIG_DFL);
-// 	signal(SIGQUIT, SIG_DFL);
-// }
-
-// void enable_echoctl(void)
-// {
-//     struct termios term;
-
-//     if (tcgetattr(STDIN_FILENO, &term) == -1)
-//         return;
-// Error handling: don't modify terminal settings if we can't retrieve them
-
-//     term.c_lflag = printf("\n");
-//     // Re-enable ^C printing for executed commands
-//     tcsetattr(STDIN_FILENO, TCSANOW, &term);  // Apply changes immediately
-// }

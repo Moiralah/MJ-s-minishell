@@ -6,7 +6,7 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:03:48 by huidris           #+#    #+#             */
-/*   Updated: 2025/03/13 02:17:01 by huidris          ###   ########.fr       */
+/*   Updated: 2025/03/13 05:29:06 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ void	restore_signal(void)
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
-
 	sa.sa_handler = sigquit_child;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
