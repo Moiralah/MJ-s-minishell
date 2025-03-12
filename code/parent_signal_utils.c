@@ -50,7 +50,8 @@ void	disable_echoctl(void)
 
 void	sigint_handler(int signo)
 {
-	(void)signo;
+	(void) signo;
+	g_signal = 130;
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
@@ -100,33 +101,3 @@ void	init_signal(void)
 //     // Re-enable ^C printing for executed commands
 //     tcsetattr(STDIN_FILENO, TCSANOW, &term);  // Apply changes immediately
 // }
-void sigint_child(int signo)
-{
-    (void)signo;
-    write(1, "\n", 1);
-}
-
-void sigquit_child(int signo)
-{
-    (void)signo;
-    write(2, "Quit (core dumped)\n", 20);
-}
-
-void restore_signal(void)
-{
-    struct sigaction sa;
-
-    // Restore SIGINT (Ctrl+C) and SIGQUIT (Ctrl+\) to default
-    sa.sa_handler = sigint_child;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGINT, &sa, NULL);
-
-	sa.sa_handler = sigquit_child;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGQUIT, &sa, NULL);
-
-    // Re-enable ^C and other control character printing
-    //enable_echoctl();
-}

@@ -12,6 +12,8 @@
 
 #include "minishell.h"
 
+int	g_signal;
+
 void	executing(t_head *head, t_exit *ex)
 {
 	t_node	*cur;
@@ -20,20 +22,16 @@ void	executing(t_head *head, t_exit *ex)
 	cur = head->start;
 	while (cur != NULL)
 	{
-		change_io(cur, head);
 		i = cur->run(cur->params, head);
-		if (i == -1)
-		{
-			free(head->input);
-			head->input = strjoin_n_gnl(head->ori_fd[1]);
-		}
 		ex->code = 0;
 		if (i > 0)
 			ex->code = i;
 		cur = cur->next;
 	}
-	change_io(cur, head);
-	pipe_handling(&head->fd, head->ori_fd, head->com_amnt);
+	run_pipe(NULL, head);
+	pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
+	close(head->ori_fd[0]);
+	close(head->ori_fd[1]);
 	i = 0;
 	while (i != -1)
 		i = waitpid(-1, NULL, 0);
@@ -44,11 +42,11 @@ void	linking(t_head *head, t_exit *ex, char *comm, int index)
 {
 	t_node	*temp;
 
-	if (!head->start)
-		head->start = create_redir_node(0, NULL);
 	temp = head->start;
 	while (temp->next != NULL)
 		temp = temp->next;
+	temp->next = create_pipe_node(index);
+	temp = temp->next;
 	comm = expansion(head->envp, ex, comm, 0);
 	comm = fnames_to_nodes(temp, comm, '<');
 	while (temp->next != NULL)
@@ -57,14 +55,6 @@ void	linking(t_head *head, t_exit *ex, char *comm, int index)
 	while (temp->next != NULL)
 		temp = temp->next;
 	temp->next = function_matching(comm);
-	temp->next->to_pipe = index + 1;
-	if (head->start->params[0][0] == 0)
-	{
-		temp = head->start;
-		head->start = temp->next;
-		free2d(temp->params);
-		free(temp);
-	}
 }
 
 void	initialising(t_list **envp, t_exit *ex, char **comms, char *line)
@@ -73,7 +63,13 @@ void	initialising(t_list **envp, t_exit *ex, char **comms, char *line)
 	int		i;
 
 	i = -1;
+	if (g_signal)
+	{
+		ex->code = g_signal;
+		g_signal = 0;
+	}
 	head = create_head_node(*envp, line, strlist_len(comms));
+	head->start = create_pipe_node(-2);
 	while (comms[++i] != NULL)
 		linking(head, ex, comms[i], i);
 	free(comms);
@@ -118,6 +114,7 @@ int	main(int argc, char **argv, char **local_envp)
 	char	*input;
 	int		running;
 
+	g_signal = 0;
 	running = -1;
 	if ((argc > 1) && (argv != NULL))
 		return (printf("Don't give any args"), -1);

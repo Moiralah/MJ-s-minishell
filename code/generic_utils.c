@@ -58,28 +58,44 @@ char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch)
 			cur_node->next = create_redir_node(ch, fname);
 		cur_node = cur_node->next;
 		comm = strnrplc(comm, NULL, i, ft_strlen(fname));
+		free(fname);
 		i = 0;
 	}
 	return (comm);
 }
 
-int	pipe_handling(int **fd, int *ori_fd, int len)
+int	pipe_handling(int **fd, int len)
 {
 	int	i;
 
 	i = -1;
 	if (fd[0] == NULL)
 	{
-		fd[0] = ft_calloc((len - 1) * 2, sizeof(int));
+		fd[0] = ft_calloc(len, sizeof(int));
 		while (++i < (len - 1))
 			pipe(fd[0] + (2 * i));
 		return (0);
 	}
-	while (++i < ((len - 1) * 2))
+	while (++i < len)
 		close(fd[0][i]);
-	close(ori_fd[0]);
-	close(ori_fd[1]);
 	return (1);
+}
+
+void	free_exec_list(t_head *head)
+{
+	t_node	*temp;
+
+	while (head->start != NULL)
+	{
+		temp = head->start;
+		head->start = head->start->next;
+		free2d(temp->params);
+		free(temp);
+	}
+	free(head->input);
+	free(head->ori_fd);
+	free(head->fd);
+	free(head);
 }
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev)
@@ -93,7 +109,7 @@ void	remove_link(t_list **head, t_list *cur, t_list *prev)
 	free(cur);
 }
 
-void	error_exit(t_node *start, t_node *cur)
+/* void	error_exit(t_node *start, t_node *cur)
 {
 	t_node	*temp;
 	int		to_free;
@@ -114,4 +130,4 @@ void	error_exit(t_node *start, t_node *cur)
 			free2d(temp->params);
 		free(temp);
 	}
-}
+} */

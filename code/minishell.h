@@ -22,6 +22,10 @@
 # include <readline/history.h>
 # include "../libft/libft.h"
 
+//////////////////// Global Variable ///////////////////////////////////////
+
+extern int	g_signal;
+
 //////////////////// Link List Node ////////////////////////////////////////
 
 typedef struct s_exit
@@ -64,8 +68,6 @@ typedef struct s_node
 
 t_head	*create_head_node(t_list *envp, char *input, int com_amnt);
 
-t_node	*create_pipe_node(int *fd, int i, int final);
-
 t_node	*create_cd_node(char **path);
 
 t_node	*create_echo_node(char **to_print);
@@ -84,7 +86,19 @@ t_node	*create_env_node(char **var);
 
 t_node	*create_redir_node(char ch, char *filename);
 
-//////////////////// Run Node //////////////////////////////////////////
+////////////////////  Manage Run Node //////////////////////////////////////////
+
+int		run_redir(char **params, t_head *head);
+
+int		run_pipe(char **params, t_head *head);
+
+int		run_env(char **params, t_head *head);
+
+int		run_exec(char **params, t_head *head);
+
+int		run_exit(char **params, t_head *head);
+
+//////////////////// Built-In Run Node /////////////////////////////////////
 
 int		run_cd(char **params, t_head *head);
 
@@ -95,16 +109,6 @@ int		run_pwd(char **params, t_head *head);
 int		run_export(char **params, t_head *head);
 
 int		run_unset(char **params, t_head *head);
-
-int		run_pipe(char **params, t_head *head);
-
-int		run_redir(char **params, t_head *head);
-
-int		run_env(char **params, t_head *head);
-
-int		run_exec(char **params, t_head *head);
-
-int		run_exit(char **params, t_head *head);
 
 //////////////////// ENV Utils //////////////////////////////////////////
 
@@ -124,11 +128,11 @@ t_node	*function_matching(char *str);
 
 char	*fnames_to_nodes(t_node *cur_node, char *comm, char ch);
 
-int		pipe_handling(int **pipe, int *ori_fd, int len);
+int		pipe_handling(int **pipe, int len);
+
+void	free_exec_list(t_head *head);
 
 void	remove_link(t_list **head, t_list *cur, t_list *prev);
-
-void	error_exit(t_node *start, t_node *cur);
 
 ////////////////////  More Generic Utils ///////////////////////////////////
 
@@ -136,13 +140,13 @@ char	*expansion(t_list *envp, t_exit *ex, char *str, int i);
 
 char	*find_path(char *params, t_list *envp);
 
-int		legitnum(char *str);
+int		verify_ch(char ch, char *set);
 
-void	change_io(t_node *cur, t_head *head);
+int		legitnum(char *str);
 
 int		run_heredoc(char **params, t_head *head);
 
-////////////////////  Signal Utils ////////////////////////////////////////
+////////////////////  Parent Signal Utils //////////////////////////////////
 
 void	disable_echoctl(void);
 
@@ -152,9 +156,17 @@ void	signal_ignore(void);
 
 void	init_signal(void);
 
+////////////////////  Child Signal Utils ///////////////////////////////////
+
 void	restore_signal(void);
 
+void	sigint_child(int signo);
+
+void	sigquit_child(int signo);
+
 ////////////////////  Str Utils ////////////////////////////////////////
+
+char	**linklist_to_strlist(t_list *linklist);
 
 char	*strjoin_n_gnl(int fd);
 
@@ -164,21 +176,16 @@ int		fname_len(char *word, char *ig_set);
 
 int		strlist_len(char **strlist);
 
-///// TEMP ////////
+///////////////////   Create Special Node //////////////////////////////
 
 t_node	*create_heredoc_node(char **delimiter);
 
-// char	*expand_error_code(t_exit *ex, char *str, int *i, int *q);
+t_node	*create_pipe_node(int index);
 
-char	**linklist_to_strlist(t_list *linklist);
+char	*str_remove_set(char *str, char *set);
 
-int		verify_ch(char ch, char *set);
+void	finish_heredoc(t_head *head, char **str, int *fds);
 
-void	free_exec_list(t_head *head);
-
-// int		run_built_in(t_node **n, t_exit **ex, char **input);
-
-// t_node	**resetting(t_node *start, char *input, int **fd, int com_amnt);
 ////////////////////  END ///////////////////////////////////////////////
 
 #endif

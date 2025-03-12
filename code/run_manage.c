@@ -12,6 +12,34 @@
 
 #include "minishell.h"
 
+int	run_pipe(char **params, t_head *head)
+{
+	int	index;
+
+	if (!params)
+	{
+		dup2(head->ori_fd[0], STDIN_FILENO);
+		dup2(head->ori_fd[1], STDOUT_FILENO);
+		return (0);
+	}
+	if (head->com_amnt <= 1)
+		return (0);
+	index = ft_atoi(params[0]);
+	if (index == 1)
+		dup2(head->fd[1], STDOUT_FILENO);
+	else if (index == head->com_amnt)
+	{
+		dup2(head->fd[(index * 2) - 4], STDIN_FILENO);
+		dup2(head->ori_fd[1], STDOUT_FILENO);
+	}
+	else
+	{
+		dup2(head->fd[(index * 2) - 4], STDIN_FILENO);
+		dup2(head->fd[(index * 2) - 1], STDOUT_FILENO);
+	}
+	return (0);
+}
+
 int	run_redir(char **params, t_head *head)
 {
 	int	fd;
@@ -77,7 +105,9 @@ int	run_exec(char **params, t_head *head)
 		return (printf("bash: error: fork failed\n"), errno);
 	if (pid == 0)
 	{
-		pipe_handling(&head->fd, head->ori_fd, head->com_amnt);
+		pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
+		close(head->ori_fd[0]);
+		close(head->ori_fd[1]);
 		restore_signal();
 		execve(path, params, arr_envp);
 	}

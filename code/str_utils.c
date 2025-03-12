@@ -12,12 +12,38 @@
 
 #include "minishell.h"
 
+char	**linklist_to_strlist(t_list *linklist)
+{
+	t_list	*temp;
+	char	**strlist;
+	char	*line;
+	int		len;
+
+	len = 0;
+	temp = linklist;
+	while (temp != NULL)
+	{
+		len++;
+		temp = temp->next;
+	}
+	strlist = ft_calloc(len + 1, sizeof(char *));
+	temp = linklist;
+	while (temp != NULL)
+	{
+		line = ft_strjoin(ft_strdup(temp->key), ft_strdup("="));
+		line = ft_strjoin(line, ft_strdup(temp->val));
+		strlist[strlist_len(strlist)] = line;
+		temp = temp->next;
+	}
+	return (strlist);
+}
+
 char	*strjoin_n_gnl(int fd)
 {
 	char	*line;
 	char	*temp;
 
-	line = ft_calloc(1, sizeof(char));
+	line = NULL;
 	temp = get_next_line(fd);
 	while (temp != NULL)
 	{

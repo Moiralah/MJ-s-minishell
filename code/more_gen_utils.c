@@ -64,6 +64,48 @@ char	*find_path(char *params, t_list *envp)
 	return (path);
 }
 
+int	run_heredoc(char **params, t_head *head)
+{
+	char	*s[2];
+	int		fds[3];
+
+	if (pipe(fds) == -1)
+		return (printf("Error: failed to create pipe\n"), 1);
+	s[1] = NULL;
+	fds[2] = dup(STDOUT_FILENO);
+	dup2(head->ori_fd[1], STDOUT_FILENO);
+	while (1)
+	{
+		s[0] = readline(">");
+		if (!s[0] || !ft_strcmp(s[0], params[1]))
+			break ;
+		s[0] = ft_strjoin(s[0], ft_strdup("\n"));
+		s[1] = ft_strjoin(s[1], ft_strdup(s[0]));
+		write(fds[1], s[0], ft_strlen(s[0]));
+		free(s[0]);
+	}
+	return (finish_heredoc(head, s, fds), 0);
+}
+
+int	verify_ch(char ch, char *set)
+{
+	char	**chs;
+	int		i;
+
+	i = -1;
+	chs = ft_split(set, '|');
+	while (chs[++i] != NULL)
+	{
+		if (ch == ft_atoi(chs[i]))
+		{
+			free2d(chs);
+			return (1);
+		}
+	}
+	free2d(chs);
+	return (0);
+}
+
 int	legitnum(char *str)
 {
 	if (!str || !*str)
@@ -79,56 +121,4 @@ int	legitnum(char *str)
 		str++;
 	}
 	return (1);
-}
-
-void	change_io(t_node *cur, t_head *head)
-{
-	if (!cur)
-	{
-		dup2(head->ori_fd[0], STDIN_FILENO);
-		dup2(head->ori_fd[1], STDOUT_FILENO);
-		return ;
-	}
-	if ((!cur->to_pipe) || (head->com_amnt == 1))
-		return ;
-	if (cur->to_pipe == 1)
-		dup2(head->fd[1], STDOUT_FILENO);
-	else if (cur->to_pipe == head->com_amnt)
-	{
-		dup2(head->fd[(cur->to_pipe * 2) - 4], STDIN_FILENO);
-		dup2(head->ori_fd[1], STDOUT_FILENO);
-	}
-	else
-	{
-		dup2(head->fd[(cur->to_pipe * 2) - 4], STDIN_FILENO);
-		dup2(head->fd[(cur->to_pipe * 2) - 1], STDOUT_FILENO);
-	}
-}
-
-int	run_heredoc(char **params, t_head *head)
-{
-	char	*line;
-	int		pipefd[2];
-
-	(void) head;
-	if (pipe(pipefd) == -1)
-		return (printf("Error: failed to create pipe\n"), 1);
-	while (1)
-	{
-		line = readline(">");
-		if (!line)
-			break ;
-		if (ft_strcmp(line, params[1]) == 0)
-		{
-			free(line);
-			break ;
-		}
-		write(pipefd[1], line, ft_strlen(line));
-		write(pipefd[1], "\n", 1);
-		free(line);
-	}
-	close(pipefd[1]);
-	dup2(pipefd[0], STDIN_FILENO);
-	close(pipefd[0]);
-	return (0);
 }
