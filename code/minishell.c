@@ -47,7 +47,7 @@ void	linking(t_head *head, t_exit *ex, char *comm, int index)
 		temp = temp->next;
 	temp->next = create_pipe_node(index);
 	temp = temp->next;
-	comm = expansion(head->envp, ex, comm, 0);
+	comm = expansion(head->envp, ex, comm, -1);
 	comm = fnames_to_nodes(temp, comm, '<');
 	while (temp->next != NULL)
 		temp = temp->next;
