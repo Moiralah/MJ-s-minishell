@@ -108,7 +108,7 @@ t_node	*create_redir_node(char ch, char *filename)
 	trim_qs[2] = '\0';
 	filename = ft_strtrim(filename, trim_qs);
 	new_node = ft_calloc(1, sizeof(t_node));
-	new_node->params = ft_calloc(3, sizeof(char));
+	new_node->params = ft_calloc(3, sizeof(char *));
 	new_node->params[0] = ft_strdup(str_ch);
 	new_node->params[1] = ft_strtrim(filename, " <>");
 	new_node->params[2] = NULL;

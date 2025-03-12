@@ -83,8 +83,12 @@ int	legitnum(char *str)
 
 void	change_io(t_node *cur, t_head *head)
 {
-	if (!cur && !dup2(head->ori_fd[0], STDIN_FILENO))
+	if (!cur)
+	{
+		dup2(head->ori_fd[0], STDIN_FILENO);
+		dup2(head->ori_fd[1], STDOUT_FILENO);
 		return ;
+	}
 	if ((!cur->to_pipe) || (head->com_amnt == 1))
 		return ;
 	if (cur->to_pipe == 1)

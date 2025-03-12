@@ -65,7 +65,6 @@ int	fname_len(char *word, char *ig_set)
 	n[3] = 0;
 	while ((word[++n[0]] != '\0') && (!(n[2] && n[3])))
 	{
-		n[1] = 0;
 		if (word[n[0]] == '"')
 			n[0] = ft_strchr(word + n[0] + 1, '"') - word;
 		else if (word[n[0]] == 39)

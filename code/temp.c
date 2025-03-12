@@ -84,6 +84,8 @@ void	free_exec_list(t_head *head)
 	free(head->fd);
 	free(head);
 }
+
+t_node *create_pipe_node
 /* char	*expand_error_code(t_exit *ex, char *str, int *i, int *q)
 {
 	char	*exit_code;

@@ -18,8 +18,10 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	size_t	s2_len;
 	char	*join;
 
-	if (!s1 || !s2)
-		return (NULL);
+	if (!s1)
+		return ((char *)s2);
+	if (!s2)
+		return ((char *)s1);
 	s1_len = ft_strlen(s1);
 	s2_len = ft_strlen(s2);
 	join = (char *)malloc((s1_len + s2_len + 1) * sizeof(char));

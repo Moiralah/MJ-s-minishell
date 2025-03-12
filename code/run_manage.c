@@ -16,6 +16,7 @@ int	run_redir(char **params, t_head *head)
 {
 	int	fd;
 
+	(void) head;
 	if (params[0][0] == '<')
 		fd = open(params[1], O_RDONLY, 0666);
 	else if (params[0][0] == '>')
@@ -28,9 +29,9 @@ int	run_redir(char **params, t_head *head)
 		return (2);
 	}
 	if (params[0][0] == '<')
-		dup2(fd, head->ori_fd[0]);
+		dup2(fd, STDIN_FILENO);
 	else if ((params[0][0] == '>') || (params[0][0] == '?'))
-		dup2(fd, head->ori_fd[1]);
+		dup2(fd, STDOUT_FILENO);
 	return (close(fd), 0);
 }
 
