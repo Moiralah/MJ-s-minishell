@@ -36,31 +36,43 @@ t_node	*create_pipe_node(int index)
 	return (new_node);
 }
 
-char	*str_remove_set(char *str, char *set)
+char	*str_remove_q(char *str)
 {
-	char		**chs;
-	char		*start;
-	long int	q;
-	int			i;
+	int		i;
+	int		q;
 
 	i = -1;
-	chs = ft_split(set, '|');
-	while (chs[++i] != NULL)
+	while (str[++i] != '\0')
 	{
-		q = 1;
-		while (q > 0)
-		{
-			start = ft_strchr(str, ft_atoi(chs[i]));
-			if (start == NULL)
-				break ;
-			q = start - str;
-			if (q == (long int) ft_strlen(str))
-				break ;
-			str = strnrplc(str, NULL, q, 0);
-		}
+		q = -1;
+		if ((str[i] == '"') | (str[i] == 39))
+			q = ft_strchr(str + i + 1, str[i]) - str;
+		if (q < 0)
+			continue ;
+		str = strnrplc(str, NULL, q, 1);
+		str = strnrplc(str, NULL, i, 1);
+		i = q - 1;
 	}
-	free2d(chs);
 	return (str);
+}
+
+char	*exp_correct_key(char *str)
+{
+	char	*key;
+	int		i;
+
+	i = ft_strchr(str, '=') - str;
+	if ((i <= 0) || !ft_isalpha(str[0]))
+	{
+		printf("bash: export: %s: not a valid identifier\n", str);
+		return (NULL);
+	}
+	key = ft_substr(str, 0, i);
+	if (!ft_strchr(key, ' '))
+		return (key);
+	printf("bash: export: %s: not a valid identifier\n", key);
+	free(key);
+	return (NULL);
 }
 
 void	finish_heredoc(t_head *head, char **str, int *fds)

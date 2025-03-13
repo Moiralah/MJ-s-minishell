@@ -74,27 +74,28 @@ int	run_pwd(char **params, t_head *head)
 
 int	run_export(char **params, t_head *head)
 {
-	char		*s[2];
-	int			i[3];
+	char	*key;
+	char	*val;
+	int		error;
+	int		i;
+	int		q;
 
-	i = 0;
-	e = 0;
 	if (!params[1])
 		return (run_env(params, head));
+	i = 0;
 	while (params[++i])
 	{
-		q = ft_strchr(params[i], '=') - params[i];
-		if ((q == 0) || ft_isdigit(params[i][0]))
-			printf("bash: export: %s: not a valid identifier\n", params[i]);
-		if ((q == 0) || ft_isdigit(params[i][0]))
-			e = 1;
-		if ((q <= 0) || ft_isdigit(params[i][0]))
+		key = exp_correct_key(params[i]);
+		if (!key)
+		{
+			error = 1;
 			continue ;
-		s[0] = ft_substr(params[i], 0, q);
-		s[1] = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);
+		}
+		q = ft_strchr(params[i], '=') - params[i];
+		val = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);
 		ft_setenv(&(head->envp), key, val, 1);
 	}
-	return (e);
+	return (error);
 }
 
 int	run_unset(char **params, t_head *head)

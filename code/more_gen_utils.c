@@ -21,7 +21,7 @@ char	*expansion(t_list *envp, t_exit *ex, char *str, int i)
 	while (str[++i] != '\0')
 	{
 		var[0] = NULL;
-		if (str[i] == 39)
+		if ((str[i] == 39) && ft_strchr(str + i + 1, 39))
 			i = ft_strchr(str + i + 1, 39) - str;
 		if (str[i] == '$')
 			q = i;
@@ -30,10 +30,10 @@ char	*expansion(t_list *envp, t_exit *ex, char *str, int i)
 		if (!var[0])
 			continue ;
 		var[1] = ft_strdup(ft_getenv(var[0], envp));
-		if (var[1][0] == '\0')
+		if ((var[1][0] == '\0') && (var[0][0] == '?'))
 			(free(var[1]), var[1] = ft_itoa(ex->code));
 		free(var[0]);
-		str = strnrplc(str, var[1], q, i - q);
+		str = strnrplc(str, var[1], q, i - q + 1);
 		i = -1;
 		q = -2;
 	}
@@ -46,9 +46,7 @@ char	*find_path(char *params, t_list *envp)
 	char	*path;
 	int		i;
 
-	if (*ft_getenv(params, envp) == '\0')
-		return (NULL);
-	if (access(params, F_OK) == 0)
+	if (ft_strchr(params, '/'))
 		return (params);
 	path = ft_getenv("PATH", envp);
 	path_list = ft_split(path, ':');
@@ -57,7 +55,7 @@ char	*find_path(char *params, t_list *envp)
 	{
 		path = ft_strjoin(ft_strdup("/"), ft_strdup(params));
 		path = ft_strjoin(ft_strdup(path_list[i]), path);
-		if (access(path, F_OK) == 0)
+		if (access(path, X_OK) == 0)
 			break ;
 		free(path);
 		path = NULL;

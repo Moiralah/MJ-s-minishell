@@ -182,7 +182,9 @@ t_node	*create_heredoc_node(char **delimiter);
 
 t_node	*create_pipe_node(int index);
 
-char	*str_remove_set(char *str, char *set);
+char	*str_remove_q(char *str);
+
+char	*exp_correct_key(char *str);
 
 void	finish_heredoc(t_head *head, char **str, int *fds);
 

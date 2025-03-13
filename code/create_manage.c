@@ -38,7 +38,7 @@ t_node	*create_exec_node(char **comm_n_flags)
 
 	i = -1;
 	while (comm_n_flags[++i] != NULL)
-		comm_n_flags[i] = str_remove_set(comm_n_flags[i], "34|39");
+		comm_n_flags[i] = str_remove_q(comm_n_flags[i]);
 	new_node = ft_calloc(1, sizeof(t_node));
 	new_node->params = comm_n_flags;
 	new_node->run = run_exec;
@@ -94,8 +94,8 @@ t_node	*create_redir_node(char ch, char *filename)
 		return (create_heredoc_node(ft_splitmj(filename, ' ')));
 	str_ch[0] = ch;
 	str_ch[1] = '\0';
-	trimmed = ft_strdup(filename);
-	trimmed = str_remove_set(trimmed, "32|34|39|60|62");
+	trimmed = ft_strtrim(filename, " <>");
+	trimmed = str_remove_q(trimmed);
 	new_node = ft_calloc(1, sizeof(t_node));
 	new_node->params = ft_calloc(3, sizeof(char *));
 	new_node->params[0] = ft_strdup(str_ch);

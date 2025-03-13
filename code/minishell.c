@@ -32,9 +32,6 @@ void	executing(t_head *head, t_exit *ex)
 	pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
 	close(head->ori_fd[0]);
 	close(head->ori_fd[1]);
-	i = 0;
-	while (i != -1)
-		i = waitpid(-1, NULL, 0);
 	add_history(head->input);
 }
 

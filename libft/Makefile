@@ -62,7 +62,7 @@ files 	   = ft_strlen \
 
 Compiler	= gcc
 
-CmpFlags	= -Wall -Wextra -Werror
+CmpFlags	= -Wall -Wextra -Werror -g3
 
 OUTN	= $(Library).a
 

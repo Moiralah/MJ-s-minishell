@@ -109,26 +109,3 @@ void	remove_link(t_list **head, t_list *cur, t_list *prev)
 	free(cur->val);
 	free(cur);
 }
-
-/* void	error_exit(t_node *start, t_node *cur)
-{
-	t_node	*temp;
-	int		to_free;
-
-	to_free = 0;
-	if (errno)
-		printf("Error: %s\n", strerror(errno));
-	temp = start;
-	start = start->next;
-	free(temp);
-	while (start != NULL)
-	{
-		temp = start;
-		start = start->next;
-		if (temp == cur)
-			to_free = 1;
-		if (to_free)
-			free2d(temp->params);
-		free(temp);
-	}
-} */

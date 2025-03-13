@@ -95,11 +95,10 @@ int	run_exec(char **params, t_head *head)
 	pid_t	pid;
 	char	**arr_envp;
 	char	*path;
+	int		status;
 
 	arr_envp = linklist_to_strlist(head->envp);
 	path = find_path(params[0], head->envp);
-	if (!path)
-		return (printf("%s: command not found\n", params[0]), 127);
 	pid = fork();
 	if (pid == -1)
 		return (printf("bash: error: fork failed\n"), errno);
@@ -109,9 +108,15 @@ int	run_exec(char **params, t_head *head)
 		close(head->ori_fd[0]);
 		close(head->ori_fd[1]);
 		execve(path, params, arr_envp);
+		free_exec_list(head);
+		exit(errno + 113);
 	}
 	signal_ignore();
-	return (0);
+	waitpid(-1, &status, 0);
+	if (WEXITSTATUS(status) != 127)
+		return (WEXITSTATUS(status));
+	dup2(head->ori_fd[1], STDOUT_FILENO);
+	return (printf("%s: command not found\n", params[0]), WEXITSTATUS(status));
 }
 
 int	run_exit(char **params, t_head *head)
