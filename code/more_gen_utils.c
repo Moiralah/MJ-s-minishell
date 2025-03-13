@@ -20,14 +20,12 @@ char	*expansion(t_list *envp, t_exit *ex, char *str, int i)
 	q = -2;
 	while (str[++i] != '\0')
 	{
-		//if (i + 1 >= (int)ft_strlen(str))
-		//	break;
 		var[0] = NULL;
 		if (str[i] == 39)
-			i = ft_strchr(str + i + 1, 39) - str + 1;
+			i = ft_strchr(str + i + 1, 39) - str;
 		if (str[i] == '$')
 			q = i;
-		if (q != -2 && str[i] != '\0' && verify_ch(str[i + 1], "0|9|10|32|34|36"))
+		if (verify_ch(str[i + 1], "0|9|10|32|34|36"))
 			var[0] = ft_substr(str, q + 1, i - q);
 		if (!var[0])
 			continue ;

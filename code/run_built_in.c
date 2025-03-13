@@ -74,11 +74,8 @@ int	run_pwd(char **params, t_head *head)
 
 int	run_export(char **params, t_head *head)
 {
-	char		*key;
-	char		*val;
-	long int	q;
-	int			i;
-	int			e;
+	char		*s[2];
+	int			i[3];
 
 	i = 0;
 	e = 0;
@@ -93,8 +90,8 @@ int	run_export(char **params, t_head *head)
 			e = 1;
 		if ((q <= 0) || ft_isdigit(params[i][0]))
 			continue ;
-		key = ft_substr(params[i], 0, q);
-		val = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);
+		s[0] = ft_substr(params[i], 0, q);
+		s[1] = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);
 		ft_setenv(&(head->envp), key, val, 1);
 	}
 	return (e);
