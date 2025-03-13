@@ -64,13 +64,12 @@ char	*exp_correct_key(char *str)
 	i = ft_strchr(str, '=') - str;
 	if ((i <= 0) || !ft_isalpha(str[0]))
 	{
-		printf("bash: export: %s: not a valid identifier\n", str);
+		printerror("bash: export: %s: not a valid identifier\n", str);
 		return (NULL);
 	}
 	key = ft_substr(str, 0, i);
 	if (!ft_strchr(key, ' '))
 		return (key);
-	printf("bash: export: %s: not a valid identifier\n", key);
 	free(key);
 	return (NULL);
 }

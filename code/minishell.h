@@ -165,6 +165,8 @@ void	sigint_child(int signo);
 
 void	sigquit_child(int signo);
 
+void	printerror(const char *str, ...);
+
 ////////////////////  Str Utils ////////////////////////////////////////
 
 char	**linklist_to_strlist(t_list *linklist);

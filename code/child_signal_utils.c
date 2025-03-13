@@ -6,7 +6,7 @@
 /*   By: huidris <huidris@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 23:03:48 by huidris           #+#    #+#             */
-/*   Updated: 2025/03/13 05:29:06 by huidris          ###   ########.fr       */
+/*   Updated: 2025/03/14 04:51:21 by huidris          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,29 @@ void	sigint_child(int signo)
 void	sigquit_child(int signo)
 {
 	(void) signo;
-	write(2, "Quit (core dumped)\n", 20);
+	printerror("Quit (core dumped)\n");
 	g_signal = 131;
+}
+
+//// printerror ////
+
+void	printerror(const char *str, ...)
+{
+	va_list	ap;
+	int		i;
+
+	i = 0;
+	va_start(ap, str);
+	while (str[i])
+	{
+		if (str[i] == '%' && str[i+1] && str[i+1] == 's')
+		{
+			i++;
+			ft_putstr_fd(va_arg(ap, char *), 2);
+		}
+		else
+			ft_putchar_fd(str[i], 2);
+		i++;
+	}
+	va_end(ap);
 }

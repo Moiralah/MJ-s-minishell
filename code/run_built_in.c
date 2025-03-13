@@ -18,7 +18,7 @@ int	run_cd(char **params, t_head *head)
 	char	*home;
 
 	if (strlist_len(params) > 2)
-		return (printf("bash: cd : too many arguments\n"), 1);
+		return (printerror("bash: cd : too many arguments\n"), 1);
 	home = ft_getenv("HOME", head->envp);
 	if (!params[1] || !ft_strcmp(params[1], home) || params[1][0] == '~')
 		new_path = home;
@@ -29,7 +29,7 @@ int	run_cd(char **params, t_head *head)
 	ft_setenv(&(head->envp), "OLDPWD", getcwd(NULL, 0), 1);
 	if (chdir(new_path) == -1)
 	{
-		printf("bash: cd: %s: No such file or directory\n", new_path);
+		printerror("bash: cd: %s: No such file or directory\n", new_path);
 		return (1);
 	}
 	ft_setenv(&(head->envp), "PWD", getcwd(NULL, 0), 1);
@@ -83,6 +83,7 @@ int	run_export(char **params, t_head *head)
 	if (!params[1])
 		return (run_env(params, head));
 	i = 0;
+	error = 0;
 	while (params[++i])
 	{
 		key = exp_correct_key(params[i]);

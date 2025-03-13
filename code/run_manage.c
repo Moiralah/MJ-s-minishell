@@ -49,7 +49,7 @@ int	run_redir(char **params, t_head *head)
 		fd = open(params[1], O_CREAT | O_WRONLY | O_APPEND, 0666);
 	if (fd == -1)
 	{
-		printf("bash: open: The file doesn't exists or can't be accessed\n");
+		printerror("bash: open: The file doesn't exists or can't be accessed\n");
 		return (2);
 	}
 	if (params[0][0] == '<')
@@ -66,7 +66,7 @@ int	run_env(char **params, t_head *head)
 
 	if (strlist_len(params) != 1)
 	{
-		printf("env: %s: No such file or directory\n", params[1]);
+		printerror("env: %s: No such file or directory\n", params[1]);
 		return (127);
 	}
 	temp = head->envp;
@@ -97,7 +97,7 @@ int	run_exec(char **params, t_head *head)
 	path = find_path(params[0], head->envp);
 	pid = fork();
 	if (pid == -1)
-		return (printf("bash: error: fork failed\n"), errno);
+		return (printerror("bash: error: fork failed\n"), errno);
 	if (pid == 0)
 	{
 		pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
@@ -112,7 +112,7 @@ int	run_exec(char **params, t_head *head)
 	if (WEXITSTATUS(status) != 127)
 		return (WEXITSTATUS(status));
 	dup2(head->ori_fd[1], STDOUT_FILENO);
-	return (printf("%s: command not found\n", params[0]), WEXITSTATUS(status));
+	return (printerror("%s: command not found\n", params[0]), WEXITSTATUS(status));
 }
 
 int	run_exit(char **params, t_head *head)
@@ -124,21 +124,22 @@ int	run_exit(char **params, t_head *head)
 		free_exec_list(head);
 		exit(0);
 	}
-	else if (strlist_len(params) == 2 && legitnum(params[1]))
+	else if (strlist_len(params) == 2)// && legitnum(params[1]))
 	{
+		if ((params[1][0] == '-' || params[1][0] == '+')
+			&& (params[1][1] == '"' || params[1][1] == 39))
+			params[1] = str_remove_q(params[1]);
+		else if (!legitnum(params[1]))
+		{
+			printerror("exit: %s: numeric argument required\n", params[1]);
+			free_exec_list(head);
+			exit(2);
+		}
 		exit_code = ft_atoll(params[1]);
 		free_exec_list(head);
 		exit((unsigned char) exit_code);
 	}
 	else if (strlist_len(params) > 2)
-		return (ft_putstr_fd("exit: too many arguments\n", 2), 1);
-	else
-	{
-		ft_putstr_fd("exit: ", 2);
-		ft_putstr_fd(params[1], 2);
-		ft_putstr_fd(": numeric argument required\n", 2);
-		free_exec_list(head);
-		exit(2);
-	}
+		return (printerror("exit: too many arguments\n"), 1);
 	return (0);
 }
