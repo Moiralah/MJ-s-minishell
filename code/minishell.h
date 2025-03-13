@@ -51,6 +51,7 @@ typedef struct s_head
 	int				*ori_fd;
 	int				*fd;
 	int				com_amnt;
+	int				cur_pipe;
 	struct s_node	*start;
 }	t_head;
 

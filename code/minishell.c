@@ -28,7 +28,8 @@ void	executing(t_head *head, t_exit *ex)
 			ex->code = i;
 		cur = cur->next;
 	}
-	run_pipe(NULL, head);
+	dup2(head->ori_fd[0], STDIN_FILENO);
+	dup2(head->ori_fd[1], STDOUT_FILENO);
 	pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
 	close(head->ori_fd[0]);
 	close(head->ori_fd[1]);

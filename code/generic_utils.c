@@ -72,8 +72,8 @@ int	pipe_handling(int **fd, int len)
 	restore_signal();
 	if (fd[0] == NULL)
 	{
-		fd[0] = ft_calloc(len, sizeof(int));
-		while (++i < (len - 1))
+		fd[0] = ft_calloc((len - 1) * 2, sizeof(int));
+		while (++i < (len  - 1))
 			pipe(fd[0] + (2 * i));
 		return (0);
 	}

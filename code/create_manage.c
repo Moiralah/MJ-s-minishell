@@ -26,8 +26,9 @@ t_head	*create_head_node(t_list *envp, char *input, int com_amnt)
 	new_node->ori_fd = fd;
 	new_node->fd = NULL;
 	new_node->com_amnt = com_amnt;
+	new_node->cur_pipe = 0;
 	new_node->start = NULL;
-	pipe_handling(&new_node->fd, (com_amnt - 1) * 2);
+	pipe_handling(&new_node->fd, com_amnt);
 	return (new_node);
 }
 

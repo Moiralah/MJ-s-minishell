@@ -16,19 +16,15 @@ int	run_pipe(char **params, t_head *head)
 {
 	int	index;
 
-	if (!params)
-	{
-		dup2(head->ori_fd[0], STDIN_FILENO);
-		dup2(head->ori_fd[1], STDOUT_FILENO);
-		return (0);
-	}
-	if (head->com_amnt <= 1)
+	if ((head->com_amnt <= 1) || (params[0][0] == '-'))
 		return (0);
 	index = ft_atoi(params[0]);
+	head->cur_pipe = index - 1;
 	if (index == 1)
 		dup2(head->fd[1], STDOUT_FILENO);
 	else if (index == head->com_amnt)
 	{
+		// head->cur_pipe = index - 1;
 		dup2(head->fd[(index * 2) - 4], STDIN_FILENO);
 		dup2(head->ori_fd[1], STDOUT_FILENO);
 	}
@@ -105,13 +101,13 @@ int	run_exec(char **params, t_head *head)
 	if (pid == 0)
 	{
 		pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
-		close(head->ori_fd[0]);
-		close(head->ori_fd[1]);
+		(close(head->ori_fd[0]), close(head->ori_fd[1]));
 		execve(path, params, arr_envp);
 		free_exec_list(head);
 		exit(errno + 113);
 	}
-	signal_ignore();
+	if (head->cur_pipe != 0)
+		close(head->fd[(head->cur_pipe * 2) - 1]);
 	waitpid(-1, &status, 0);
 	if (WEXITSTATUS(status) != 127)
 		return (WEXITSTATUS(status));
