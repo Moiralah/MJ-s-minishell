@@ -60,9 +60,11 @@ char	*exp_correct_key(char *str)
 {
 	char	*key;
 	int		i;
+	int		q;
 
 	i = ft_strchr(str, '=') - str;
-	if ((i <= 0) || !ft_isalpha(str[0]))
+	q = ft_strchr(str, '-') - str;
+	if (!ft_isalpha(str[0]) || (q >= 0 && q < i))
 	{
 		printerror("bash: export: %s: not a valid identifier\n", str);
 		return (NULL);
