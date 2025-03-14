@@ -141,7 +141,7 @@ char	*expansion(t_list *envp, t_exit *ex, char *str, int i);
 
 char	*find_path(char *params, t_list *envp);
 
-int		verify_ch(char ch, char *set);
+int		get_end(char *str, char *set, int set_at_end);
 
 int		legitnum(char *str);
 

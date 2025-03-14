@@ -17,25 +17,25 @@ char	*expansion(t_list *envp, t_exit *ex, char *str, int i)
 	char	*var[2];
 	int		q;
 
-	q = -2;
 	while (str[++i] != '\0')
 	{
-		var[0] = NULL;
 		if ((str[i] == 39) && ft_strchr(str + i + 1, 39))
 			i = ft_strchr(str + i + 1, 39) - str;
-		if (str[i] == '$')
-			q = i;
-		if (verify_ch(str[i + 1], "0|9|10|32|34|36"))
-			var[0] = ft_substr(str, q + 1, i - q);
-		if (!var[0])
+		if ((str[i] != '$') || (!ft_isalpha(str[i + 1]) && (str[i + 1] != '?')))
 			continue ;
+		q = i + 1;
+		i = get_end(str + q, "0|9|10|32|34|36|63", 1) + q;
+		if (!(i - q))
+			i++;
+		var[0] = ft_substr(str, q, i - q);
 		var[1] = ft_strdup(ft_getenv(var[0], envp));
-		if ((var[1][0] == '\0') && (var[0][0] == '?'))
-			(free(var[1]), var[1] = ft_itoa(ex->code));
+		if (var[0][0] == '?')
+			free(var[1]);
+		if (var[0][0] == '?')
+			var[1] = ft_itoa(ex->code);
 		free(var[0]);
-		str = strnrplc(str, var[1], q, i - q + 1);
+		str = strnrplc(str, var[1], q - 1, i - q + 1);
 		i = -1;
-		q = -2;
 	}
 	return (str);
 }
@@ -87,23 +87,26 @@ int	run_heredoc(char **params, t_head *head)
 	return (finish_heredoc(head, s, fds), 0);
 }
 
-int	verify_ch(char ch, char *set)
+int	get_end(char *str, char *set, int set_at_end)
 {
 	char	**chs;
 	int		i;
+	int		q;
 
-	i = -1;
+	i = 0;
 	chs = ft_split(set, '|');
-	while (chs[++i] != NULL)
+	while ((size_t)i <= ft_strlen(str))
 	{
-		if (ch == ft_atoi(chs[i]))
-		{
-			free2d(chs);
-			return (1);
-		}
+		q = 0;
+		while ((chs[q] != NULL) && (str[i] != ft_atoi(chs[q])))
+			q++;
+		if ((chs[q] != NULL) && (set_at_end))
+			return (i);
+		else if ((chs[q] == NULL) && (!set_at_end))
+			return (i);
+		i++;
 	}
-	free2d(chs);
-	return (0);
+	return (-1);
 }
 
 int	legitnum(char *str)

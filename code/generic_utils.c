@@ -73,7 +73,7 @@ int	pipe_handling(int **fd, int len)
 	if (fd[0] == NULL)
 	{
 		fd[0] = ft_calloc((len - 1) * 2, sizeof(int));
-		while (++i < (len  - 1))
+		while (++i < (len - 1))
 			pipe(fd[0] + (2 * i));
 		return (0);
 	}

@@ -24,7 +24,6 @@ int	run_pipe(char **params, t_head *head)
 		dup2(head->fd[1], STDOUT_FILENO);
 	else if (index == head->com_amnt)
 	{
-		// head->cur_pipe = index - 1;
 		dup2(head->fd[(index * 2) - 4], STDIN_FILENO);
 		dup2(head->ori_fd[1], STDOUT_FILENO);
 	}
