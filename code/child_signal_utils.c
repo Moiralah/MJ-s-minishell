@@ -40,13 +40,13 @@ void	sigint_child(int signo)
 void	sigquit_child(int signo)
 {
 	(void) signo;
-	printerror("Quit (core dumped)\n");
+	perr("Quit (core dumped)\n");
 	g_signal = 131;
 }
 
-//// printerror ////
+//// perr ////
 
-void	printerror(const char *str, ...)
+void	perr(const char *str, ...)
 {
 	va_list	ap;
 	int		i;
@@ -55,7 +55,7 @@ void	printerror(const char *str, ...)
 	va_start(ap, str);
 	while (str[i])
 	{
-		if (str[i] == '%' && str[i+1] && str[i+1] == 's')
+		if ((str[i] == '%') && (str[i + 1] == 's'))
 		{
 			i++;
 			ft_putstr_fd(va_arg(ap, char *), 2);

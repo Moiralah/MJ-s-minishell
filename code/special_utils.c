@@ -58,20 +58,26 @@ char	*str_remove_q(char *str)
 
 char	*exp_correct_key(char *str)
 {
-	char	*key;
-	int		i;
-	int		q;
+	char		*key;
+	long int	i;
 
 	i = ft_strchr(str, '=') - str;
-	q = ft_strchr(str, '-') - str;
-	if (!ft_isalpha(str[0]) || (q >= 0 && q < i))
+	if ((i == 0) || !ft_isalpha(str[0]))
 	{
-		printerror("bash: export: %s: not a valid identifier\n", str);
+		perr("bash: export: %s: not a valid identifier\n", str);
 		return (NULL);
 	}
+	if (i < 0)
+		return ("\0");
+	if (str[i + 1] == '=')
+		i += 1;
 	key = ft_substr(str, 0, i);
-	if (!ft_strchr(key, ' '))
+	i = -1;
+	while ((key[i] != '\0') && ft_isalpha(key[i]) && (key[i] == ' '))
+		i++;
+	if (i == '\0')
 		return (key);
+	perr("bash: export: %s: not a valid identifier\n", str);
 	free(key);
 	return (NULL);
 }

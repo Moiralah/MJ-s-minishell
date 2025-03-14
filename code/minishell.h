@@ -165,7 +165,7 @@ void	sigint_child(int signo);
 
 void	sigquit_child(int signo);
 
-void	printerror(const char *str, ...);
+void	perr(const char *str, ...);
 
 ////////////////////  Str Utils ////////////////////////////////////////
 

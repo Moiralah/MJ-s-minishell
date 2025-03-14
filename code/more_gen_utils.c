@@ -70,7 +70,7 @@ int	run_heredoc(char **params, t_head *head)
 	int		fds[3];
 
 	if (pipe(fds) == -1)
-		return (printerror("Error: failed to create pipe\n"), 1);
+		return (perr("Error: failed to create pipe\n"), 1);
 	s[1] = NULL;
 	fds[2] = dup(STDOUT_FILENO);
 	dup2(head->ori_fd[1], STDOUT_FILENO);
