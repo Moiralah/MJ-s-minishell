@@ -38,8 +38,8 @@ t_node	*create_pipe_node(int index)
 
 char	*str_remove_q(char *str)
 {
-	int		i;
-	int		q;
+	long int	q;
+	int			i;
 
 	i = -1;
 	while (str[++i] != '\0')
@@ -60,24 +60,25 @@ char	*exp_correct_key(char *str)
 {
 	char		*key;
 	long int	i;
+	int			q;
 
 	i = ft_strchr(str, '=') - str;
-	if ((i == 0) || !ft_isalpha(str[0]))
-	{
-		perr("bash: export: %s: not a valid identifier\n", str);
-		return (NULL);
-	}
+	q = 0;
+	while ((i < 0) && (str[q] != '\0') && ft_isalpha(str[q]))
+		q++;
+	if ((i <= 0) && (str[q] != '\0'))
+		return (perr("bash: export: %s: not a valid identifier\n", str), NULL);
 	if (i < 0)
-		return ("\0");
+		return (ft_strdup(str));
 	if (str[i + 1] == '=')
 		i += 1;
 	key = ft_substr(str, 0, i);
-	i = -1;
-	while ((key[i] != '\0') && ft_isalpha(key[i]) && (key[i] == ' '))
+	i = 0;
+	while ((key[i] != '\0') && ft_isalpha(key[i]) && (key[i] != ' '))
 		i++;
-	if (i == '\0')
+	if (key[i] == '\0')
 		return (key);
-	perr("bash: export: %s: not a valid identifier\n", str);
+	perr("bash: export: |||%s: not a valid identifier\n", str);
 	free(key);
 	return (NULL);
 }

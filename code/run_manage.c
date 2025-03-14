@@ -40,6 +40,8 @@ int	run_redir(char **params, t_head *head)
 	int	fd;
 
 	(void) head;
+	if (access(params[1], R_OK))
+	return (perr("bash: open: The file can't be accesseed"), );
 	if (params[0][0] == '<')
 		fd = open(params[1], O_RDONLY, 0666);
 	else if (params[0][0] == '>')
@@ -93,7 +95,7 @@ int	run_exec(char **params, t_head *head)
 	int		status;
 
 	arr_envp = linklist_to_strlist(head->envp);
-	path = find_path(ft_strdup(params[0]), head->envp);
+	path = find_path(params[0], head->envp);
 	pid = fork();
 	if (pid == -1)
 		return (perr("bash: error: fork failed\n"), errno);
@@ -111,7 +113,7 @@ int	run_exec(char **params, t_head *head)
 	if (WEXITSTATUS(status) != 127)
 		return (WEXITSTATUS(status));
 	dup2(head->ori_fd[1], STDOUT_FILENO);
-	return (perr("%s: command not found\n", 2, params[0]), WEXITSTATUS(status));
+	return (perr("%s: command not found\n", params[0]), WEXITSTATUS(status));
 }
 
 int	run_exit(char **params, t_head *head)
@@ -123,12 +125,9 @@ int	run_exit(char **params, t_head *head)
 		free_exec_list(head);
 		exit(0);
 	}
-	else if (strlist_len(params) == 2) // && legitnum(params[1]))
+	else if (strlist_len(params) == 2)
 	{
-		if ((params[1][0] == '-' || params[1][0] == '+')
-			&& (params[1][1] == '"' || params[1][1] == 39))
-			params[1] = str_remove_q(params[1]);
-		else if (!legitnum(params[1]))
+		if (!legitnum(params[1]))
 		{
 			perr("exit: %s: numeric argument required\n", params[1]);
 			free_exec_list(head);

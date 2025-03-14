@@ -74,11 +74,11 @@ int	run_pwd(char **params, t_head *head)
 
 int	run_export(char **params, t_head *head)
 {
-	char	*key;
-	char	*val;
-	int		error;
-	int		i;
-	int		q;
+	char		*key;
+	char		*val;
+	long int	q;
+	int			error;
+	int			i;
 
 	if (!params[1])
 		return (run_env(params, head));
@@ -92,8 +92,6 @@ int	run_export(char **params, t_head *head)
 			error = 1;
 			continue ;
 		}
-		else if (*key == '\0')
-			continue ;
 		q = ft_strchr(params[i], '=') - params[i];
 		val = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);
 		ft_setenv(&(head->envp), key, val, 1);

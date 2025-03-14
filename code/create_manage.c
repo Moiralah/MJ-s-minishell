@@ -51,20 +51,11 @@ t_node	*create_exec_node(char **comm_n_flags)
 t_node	*create_exit_node(char **code)
 {
 	t_node	*new_node;
-	char	*trimmed;
-	char	to_trim[3];
 	int		i;
 
 	i = -1;
-	to_trim[0] = '"';
-	to_trim[1] = 39;
-	to_trim[2] = '\0';
 	while (code[++i] != NULL)
-	{
-		trimmed = ft_strtrim(code[i], to_trim);
-		free(code[i]);
-		code[i] = trimmed;
-	}
+		code[i] = str_remove_q(code[i]);
 	new_node = ft_calloc(1, sizeof(t_node));
 	new_node->params = code;
 	new_node->run = run_exit;
