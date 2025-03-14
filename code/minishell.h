@@ -18,6 +18,7 @@
 # include <signal.h>
 # include <termios.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "../libft/libft.h"
@@ -166,6 +167,8 @@ void	sigint_child(int signo);
 void	sigquit_child(int signo);
 
 void	perr(const char *str, ...);
+
+void	executing_cmd(t_head *head, t_exit *ex);
 
 ////////////////////  Str Utils ////////////////////////////////////////
 

@@ -66,3 +66,21 @@ void	perr(const char *str, ...)
 	}
 	va_end(ap);
 }
+
+//// executing ////
+
+void	executing_cmd(t_head *head, t_exit *ex)
+{
+	t_node	*cur;
+	int		i;
+
+	cur = head->start;
+	while (cur != NULL)
+	{
+		i = cur->run(cur->params, head);
+		ex->code = 0;
+		if (i > 0)
+			ex->code = i;
+		cur = cur->next;
+	}
+}

@@ -16,21 +16,22 @@ int	g_signal;
 
 void	executing(t_head *head, t_exit *ex)
 {
-	t_node	*cur;
+	int		status;
 	int		i;
 
-	cur = head->start;
-	while (cur != NULL)
-	{
-		i = cur->run(cur->params, head);
-		ex->code = 0;
-		if (i > 0)
-			ex->code = i;
-		cur = cur->next;
-	}
+	executing_cmd(head, ex);
 	dup2(head->ori_fd[0], STDIN_FILENO);
 	dup2(head->ori_fd[1], STDOUT_FILENO);
 	pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
+	i = 1;
+	while (i != -1)
+		i = waitpid(-1, &status, 0);
+	if ((WEXITSTATUS(status) == 126) || (WEXITSTATUS(status) == 127))
+	{
+		perr(" command not found\n");
+		ex->code = WEXITSTATUS(status);
+	}
+	status = 0;
 	close(head->ori_fd[0]);
 	close(head->ori_fd[1]);
 	add_history(head->input);

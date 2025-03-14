@@ -40,8 +40,6 @@ int	run_redir(char **params, t_head *head)
 	int	fd;
 
 	(void) head;
-	if (access(params[1], R_OK))
-	return (perr("bash: open: The file can't be accesseed"), );
 	if (params[0][0] == '<')
 		fd = open(params[1], O_RDONLY, 0666);
 	else if (params[0][0] == '>')
@@ -89,10 +87,10 @@ int	run_env(char **params, t_head *head)
 
 int	run_exec(char **params, t_head *head)
 {
-	pid_t	pid;
-	char	**arr_envp;
-	char	*path;
-	int		status;
+	struct stat	st;
+	pid_t		pid;
+	char		**arr_envp;
+	char		*path;
 
 	arr_envp = linklist_to_strlist(head->envp);
 	path = find_path(params[0], head->envp);
@@ -103,17 +101,16 @@ int	run_exec(char **params, t_head *head)
 	{
 		pipe_handling(&head->fd, (head->com_amnt - 1) * 2);
 		(close(head->ori_fd[0]), close(head->ori_fd[1]));
+		stat(path, &st);
+		if (S_ISDIR(st.st_mode))
+			exit(126);
 		execve(path, params, arr_envp);
 		free_exec_list(head);
+		if (access(path, F_OK) != 0)
+			exit(127);
 		exit(errno + 113);
 	}
-	if (head->cur_pipe != 0)
-		close(head->fd[(head->cur_pipe * 2) - 1]);
-	waitpid(-1, &status, 0);
-	if (WEXITSTATUS(status) != 127)
-		return (WEXITSTATUS(status));
-	dup2(head->ori_fd[1], STDOUT_FILENO);
-	return (perr("%s: command not found\n", params[0]), WEXITSTATUS(status));
+	return (0);
 }
 
 int	run_exit(char **params, t_head *head)
