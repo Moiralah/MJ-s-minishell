@@ -12,10 +12,12 @@
 
 #include "minishell.h"
 
-int	run_pipe(char **params, t_head *head)
+int	run_pipe(char **params, t_head *head, t_exit *ex)
 {
 	int	index;
 
+	if (ex->code < 0)
+		return (ex->code);
 	if ((head->com_amnt <= 1) || (params[0][0] == '-'))
 		return (0);
 	index = ft_atoi(params[0]);
@@ -35,10 +37,12 @@ int	run_pipe(char **params, t_head *head)
 	return (0);
 }
 
-int	run_redir(char **params, t_head *head)
+int	run_redir(char **params, t_head *head, t_exit *ex)
 {
 	int	fd;
 
+	if (ex->code < 0)
+		return (ex->code);
 	(void) head;
 	if (params[0][0] == '<')
 		fd = open(params[1], O_RDONLY, 0666);
@@ -58,16 +62,15 @@ int	run_redir(char **params, t_head *head)
 	return (close(fd), 0);
 }
 
-int	run_env(char **params, t_head *head)
+int	run_env(char **params, t_head *head, t_exit *ex)
 {
 	t_list	*temp;
 	t_list	*to_remove;
 
+	if (ex->code < 0)
+		return (1);
 	if (strlist_len(params) != 1)
-	{
-		perr("env: %s: No such file or directory\n", params[1]);
-		return (127);
-	}
+		return (perr("env: %s: No such file or directory\n", params[1]), 127);
 	temp = head->envp;
 	if (!ft_strcmp(params[0], "export"))
 	{
@@ -85,14 +88,16 @@ int	run_env(char **params, t_head *head)
 	return (0);
 }
 
-int	run_exec(char **params, t_head *head)
+int	run_exec(char **params, t_head *head, t_exit *ex)
 {
 	struct stat	st;
 	pid_t		pid;
 	char		**arr_envp;
 	char		*path;
 
-	arr_envp = linklist_to_strlist(head->envp);
+	if (ex->code < 0)
+		return (1);
+	arr_e = linklist_to_strlist(head->envp);
 	path = find_path(params[0], head->envp);
 	pid = fork();
 	if (pid == -1)
@@ -113,10 +118,12 @@ int	run_exec(char **params, t_head *head)
 	return (0);
 }
 
-int	run_exit(char **params, t_head *head)
+int	run_exit(char **params, t_head *head, t_exit *ex)
 {
 	long long int	exit_code;
 
+	if (ex->code < 0)
+		return (1);
 	if (strlist_len(params) == 1)
 	{
 		free_exec_list(head);
