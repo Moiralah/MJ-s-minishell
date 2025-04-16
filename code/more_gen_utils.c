@@ -64,13 +64,11 @@ char	*find_path(char *params, t_list *envp)
 	return (path);
 }
 
-int	run_heredoc(char **params, t_head *head, t_exit *ex)
+int	run_heredoc(char **params, t_head *head)
 {
 	char	*s[2];
 	int		fds[3];
 
-	if (ex->code < 0)
-		return (ex->code);
 	if (pipe(fds) == -1)
 		return (perr("Error: failed to create pipe\n"), 1);
 	s[1] = NULL;

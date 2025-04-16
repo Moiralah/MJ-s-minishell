@@ -61,7 +61,7 @@ typedef struct s_head
 typedef struct s_node
 {
 	char			**params;
-	int				(*run)(char **p, struct s_head *head, t_exit *ex);
+	int				(*run)(char **p, struct s_head *head);
 	int				to_pipe;
 	struct s_node	*next;
 }	t_node;

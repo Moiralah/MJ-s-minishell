@@ -12,13 +12,11 @@
 
 #include "minishell.h"
 
-int	run_cd(char **params, t_head *head, t_exit *ex)
+int	run_cd(char **params, t_head *head)
 {
 	char	*new_path;
 	char	*home;
 
-	if (ex->code < 0)
-		return (1);
 	if (strlist_len(params) > 2)
 		return (perr("bash: cd : too many arguments\n"), 1);
 	home = ft_getenv("HOME", head->envp);
@@ -30,19 +28,20 @@ int	run_cd(char **params, t_head *head, t_exit *ex)
 		new_path = params[1];
 	ft_setenv(&(head->envp), "OLDPWD", getcwd(NULL, 0), 1);
 	if (chdir(new_path) == -1)
-		return (perr("bash: cd: %s: No such file or directory\n", new_path), 1);
+	{
+		perr("bash: cd: %s: No such file or directory\n", new_path);
+		return (1);
+	}
 	ft_setenv(&(head->envp), "PWD", getcwd(NULL, 0), 1);
 	if (params[1] && (params[1][0] == '-'))
 		free(new_path);
 	return (0);
 }
 
-int	run_echo(char **params, t_head *head, t_exit *ex)
+int	run_echo(char **params, t_head *head)
 {
 	int	i;
 
-	if (ex->code < 0)
-		return (1);
 	(void) head;
 	i = 1;
 	while (params[i] && (ft_strncmp(params[i], "-n", 2) == 0))
@@ -59,12 +58,10 @@ int	run_echo(char **params, t_head *head, t_exit *ex)
 	return (0);
 }
 
-int	run_pwd(char **params, t_head *head, t_exit *ex)
+int	run_pwd(char **params, t_head *head)
 {
 	char	*cwd;
 
-	if (ex->code < 0)
-		return (1);
 	(void) params;
 	(void) head;
 	cwd = getcwd(NULL, 0);
@@ -75,7 +72,7 @@ int	run_pwd(char **params, t_head *head, t_exit *ex)
 	return (0);
 }
 
-int	run_export(char **params, t_head *head, t_exit *ex)
+int	run_export(char **params, t_head *head)
 {
 	char		*key;
 	char		*val;
@@ -83,8 +80,6 @@ int	run_export(char **params, t_head *head, t_exit *ex)
 	int			error;
 	int			i;
 
-	if (ex->code < 0)
-		return (1);
 	if (!params[1])
 		return (run_env(params, head));
 	i = 0;
@@ -92,8 +87,11 @@ int	run_export(char **params, t_head *head, t_exit *ex)
 	while (params[++i])
 	{
 		key = exp_correct_key(params[i]);
-		if ((!error) && (!key))
+		if (!key)
+		{
 			error = 1;
+			continue ;
+		}
 		q = ft_strchr(params[i], '=') - params[i];
 		val = ft_substr(params[i], q + 1, ft_strlen(params[i]) - q - 1);
 		ft_setenv(&(head->envp), key, val, 1);
@@ -101,13 +99,11 @@ int	run_export(char **params, t_head *head, t_exit *ex)
 	return (error);
 }
 
-int	run_unset(char **params, t_head *head, t_exit *ex)
+int	run_unset(char **params, t_head *head)
 {
 	t_list	*list[2];
 	int		i;
 
-	if (ex->code < 0)
-		return (1);
 	i = 0;
 	while (params[++i] != NULL)
 	{
